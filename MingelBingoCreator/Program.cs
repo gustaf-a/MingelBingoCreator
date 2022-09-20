@@ -1,12 +1,10 @@
 ﻿using MingelBingoCreator.Configurations;
-using MingelBingoCreator.Data;
 using MingelBingoCreator.DataGathering;
 using MingelBingoCreator.FinalFileGenerator;
 using MingelBingoCreator.Repository;
 using MingelBingoCreator.ValuesGeneration;
 using Newtonsoft.Json;
 using Serilog;
-using System;
 
 namespace MingelBingoCreator
 {
