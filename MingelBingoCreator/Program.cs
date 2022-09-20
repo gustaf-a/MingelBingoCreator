@@ -59,7 +59,11 @@ namespace MingelBingoCreator
                 if (string.IsNullOrEmpty(rawFile))
                     throw new Exception("Failed to find or load appsettings.json file");
 
-                return JsonConvert.DeserializeObject<AppSettings>(rawFile);
+                var appSettings = JsonConvert.DeserializeObject<AppSettings>(rawFile);
+                if (appSettings == null)
+                    throw new Exception("Failed to deserialize file to AppSettings-object.");
+
+                return appSettings;
             }
             catch (Exception e)
             {
