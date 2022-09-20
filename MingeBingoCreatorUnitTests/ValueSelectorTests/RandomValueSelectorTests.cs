@@ -1,4 +1,4 @@
-﻿
+﻿using Xunit;
 using MingelBingoCreator.Data;
 using MingelBingoCreator.ValueSelector;
 

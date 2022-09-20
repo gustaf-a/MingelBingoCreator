@@ -1,6 +1,4 @@
-﻿using Google.Apis.Sheets.v4.Data;
-using Microsoft.Extensions.Configuration;
-using MingelBingoCreator.Configurations;
+﻿using MingelBingoCreator.Configurations;
 using MingelBingoCreator.Data;
 using MingelBingoCreator.MingelBingoCreator;
 using MingelBingoCreator.Repository;
