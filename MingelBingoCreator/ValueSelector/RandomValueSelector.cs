@@ -3,7 +3,7 @@
 namespace MingelBingoCreator.ValueSelector
 {
     /// <summary>
-    /// Randomly selects from all possible values independent of categories.
+    /// Randomly selects from all possible values independent of categories while avoiding duplicates if possible.
     /// </summary>
     internal class RandomValueSelector : IValueSelector
     {
@@ -25,14 +25,11 @@ namespace MingelBingoCreator.ValueSelector
 
             _indicesSelected = new List<int>();
 
-            while (_valuesPerSelection > _values.Count)
-            {
-                foreach (var category in mingelBingoData.RawDataCategories)
-                    _values.AddRange(category.Values);
+            foreach (var category in mingelBingoData.RawDataCategories)
+                _values.AddRange(category.Values);
 
-                if (_values.Count == 0)
-                    throw new Exception("No values to select from found.");
-            }
+            if (_values.Count == 0)
+                throw new Exception("No values to select from found.");
         }
 
         public List<string> GetValues()
@@ -40,13 +37,27 @@ namespace MingelBingoCreator.ValueSelector
             var selectedValues = new List<string>();
 
             for (int i = 0; i < _valuesPerSelection; i++)
-            {
-
-
-                selectedValues.Add(_values[_random.Next(_values.Count)]);
-            }
+                selectedValues.Add(_values[GetNextRandomIndex()]);
 
             return selectedValues;
+        }
+
+        private int GetNextRandomIndex()
+        {
+            int nextIndex;
+
+            do
+            {
+                nextIndex = _random.Next(_values.Count);
+
+            } while (_indicesSelected.Contains(nextIndex));
+
+            _indicesSelected.Add(nextIndex);
+
+            if (_indicesSelected.Count >= _values.Count)
+                _indicesSelected = new List<int>();
+
+            return nextIndex;
         }
     }
 }

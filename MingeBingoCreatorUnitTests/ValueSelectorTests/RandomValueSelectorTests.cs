@@ -7,8 +7,10 @@ namespace MingeBingoCreatorUnitTests.ValueSelectorTests
     public static class RandomValueSelectorTests
     {
         [Theory]
-        [InlineData(2)]
-        [InlineData(8)]
+        [InlineData(1)]
+        [InlineData(5)]
+        [InlineData(9)]
+        [InlineData(10)]
         [InlineData(50)]
         [InlineData(100)]
         public static void RandomValueSelector_returns_correct_quantity(int quantity)
@@ -74,10 +76,5 @@ namespace MingeBingoCreatorUnitTests.ValueSelectorTests
 
             Assert.Equal(totalValues, result.Distinct().Count());
         }
-        //no duplicates if enough raw data
-
-
-        //still works even if not enough raw data
-
     }
 }
