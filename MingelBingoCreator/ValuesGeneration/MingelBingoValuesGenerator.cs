@@ -1,18 +1,18 @@
 ﻿using MingelBingoCreator.Data;
-using MingelBingoCreator.ValueSelector;
+using MingelBingoCreator.ValuesGeneration;
 
-namespace MingelBingoCreator.MingelBingoCreator
+namespace MingelBingoCreator.ValuesGeneration
 {
-    internal class MingelBingoGenerator
+    internal class MingelBingoValuesGenerator
     {
         private IValueSelector _valueSelector;
 
-        public MingelBingoGenerator(IValueSelector valueSelector)
+        public MingelBingoValuesGenerator(IValueSelector valueSelector)
         {
             _valueSelector = valueSelector;
         }
 
-        internal List<MingelBingoCard> GetBingoCards(int numberOfCardsToCreate)
+        internal List<MingelBingoCard> GetValues(int numberOfCardsToCreate)
         {
             var cards = new List<MingelBingoCard>();
 

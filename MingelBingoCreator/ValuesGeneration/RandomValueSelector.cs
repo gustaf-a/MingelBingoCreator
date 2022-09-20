@@ -1,6 +1,6 @@
 ﻿using MingelBingoCreator.Data;
 
-namespace MingelBingoCreator.ValueSelector
+namespace MingelBingoCreator.ValuesGeneration
 {
     /// <summary>
     /// Randomly selects from all possible values independent of categories while avoiding duplicates if possible.

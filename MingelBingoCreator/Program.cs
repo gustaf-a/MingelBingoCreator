@@ -1,8 +1,7 @@
 ﻿using MingelBingoCreator.Configurations;
 using MingelBingoCreator.Data;
-using MingelBingoCreator.MingelBingoCreator;
 using MingelBingoCreator.Repository;
-using MingelBingoCreator.ValueSelector;
+using MingelBingoCreator.ValuesGeneration;
 using Newtonsoft.Json;
 using Serilog;
 

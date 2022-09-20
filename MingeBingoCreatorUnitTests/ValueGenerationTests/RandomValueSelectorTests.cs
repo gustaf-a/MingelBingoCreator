@@ -1,8 +1,8 @@
 ﻿using Xunit;
 using MingelBingoCreator.Data;
-using MingelBingoCreator.ValueSelector;
+using MingelBingoCreator.ValuesGeneration;
 
-namespace MingeBingoCreatorUnitTests.ValueSelectorTests
+namespace MingeBingoCreatorUnitTests.ValueGenerationTests
 {
     public static class RandomValueSelectorTests
     {

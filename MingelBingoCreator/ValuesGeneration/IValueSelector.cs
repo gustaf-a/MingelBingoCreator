@@ -1,4 +1,4 @@
-﻿namespace MingelBingoCreator.ValueSelector
+﻿namespace MingelBingoCreator.ValuesGeneration
 {
     internal interface IValueSelector
     {
