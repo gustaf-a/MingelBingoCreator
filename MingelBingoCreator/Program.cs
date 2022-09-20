@@ -1,9 +1,12 @@
 ﻿using MingelBingoCreator.Configurations;
 using MingelBingoCreator.Data;
+using MingelBingoCreator.DataGathering;
+using MingelBingoCreator.FinalFileGenerator;
 using MingelBingoCreator.Repository;
 using MingelBingoCreator.ValuesGeneration;
 using Newtonsoft.Json;
 using Serilog;
+using System;
 
 namespace MingelBingoCreator
 {
@@ -11,62 +14,41 @@ namespace MingelBingoCreator
     {
         static void Main(string[] args)
         {
+            //----- Setup -----
+            SetupLogger();
+
+            var appSettings = GetAppSettings();
+
+            var repository = new GoogleSheetsRepository(appSettings);
+
+            var dataGatherer = new GoogleSheetsDataGatherer(appSettings, repository);
+
+            var cardsCreator = new MingelBingoValuesGenerator(ValueSelectorFactory.SelectorMethod.Random);
+
+            var finalFileGenerator = new FinalSpreadSheetGenerator(appSettings, repository);
+
+            //----- Execution -----
+
+            //Gathering Data from data files and template files
+            var mingelBingoData = dataGatherer.GatherData();
+
+            //Creating list of values from the data based on template files and AppSettings
+            var mingelBingoCards = cardsCreator.GetValues(appSettings, mingelBingoData);
+
+            //Creating a new file from template file and populating it with previously created values
+            var finalFile = finalFileGenerator.CreateFinalFile(mingelBingoCards);
+
+            //----- Closure -----
+            Log.Information($"Successfully created final file: {finalFile.Name}");
+        }
+
+        private static void SetupLogger()
+        {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Information()
                 .WriteTo.Console()
                 .WriteTo.File("logs/mingelBingoCreator.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
-
-            var appSettings = GetAppSettings();
-
-            var sheetsOptions = appSettings.GoogleSheetsOptions;
-
-            var repository = new GoogleSheetsRepository(appSettings);
-
-            //extract to separate class
-            try
-            {
-                var taskGetData = repository.GetColumns(sheetsOptions.DataSheetId, sheetsOptions.DataSheetTabName);
-
-                var taskCountPlaceHolderCells = repository.CountCellsWithValue(sheetsOptions.TemplateSheetId, sheetsOptions.TemplateSheetTabName, sheetsOptions.PlaceHolderValue);
-
-                Task.WaitAll(taskGetData, taskCountPlaceHolderCells);
-
-                var data = taskGetData.Result;
-
-                var placeHolderCellsCount = taskCountPlaceHolderCells.Result;
-
-                var mingelBingoData = new MingelBingoData(data, placeHolderCellsCount);
-
-                var valueSelector = new RandomValueSelector(mingelBingoData);
-
-                var mingelBingoGenerator = new MingelBingoGenerator(valueSelector);
-
-                //Create cards
-                var mingelBingoCards = mingelBingoGenerator.GetBingoCards(appSettings.ExportOptions.NumberOfCards);
-
-                //copy template sheet
-
-
-                //Send board objects to copy of template sheet
-
-
-                //remove template tab from template sheet
-                
-            }
-            catch (AggregateException ex)
-            {
-                foreach (var exception in ex.InnerExceptions)
-                {
-                    Log.Error("Failed to get data from Google Sheets API: {0}", exception.Message);
-                }
-
-                throw;
-            }
-
-            //läs in rader
-
-            //läs antal 
         }
 
         private static AppSettings GetAppSettings()
