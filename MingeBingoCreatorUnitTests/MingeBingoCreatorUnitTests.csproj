@@ -26,4 +26,8 @@
     <ProjectReference Include="..\MingelBingoCreator\MingelBingoCreator.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="MingelBingoCreatorTests\" />
+  </ItemGroup>
+
 </Project>
