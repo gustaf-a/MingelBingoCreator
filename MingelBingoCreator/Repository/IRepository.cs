@@ -23,11 +23,17 @@ namespace MingelBingoCreator.Repository
         /// <summary>
         /// Goes through all placeholder values in a sheet and replaces them with the provided values.
         /// </summary>
-        /// <param name="sheetId">Id of the spreadsheet.</param>
-        /// <param name="sheetName">Name of the tab.</param>
+        /// <param name="spreadSheet">The spreadsheet to be worked on.</param>
         /// <param name="placeholderValue">Placeholder value to look for in cells</param>
-        /// <param name="values">Values to insert into the sheet instead of the placeholders. Must match number of placeholders.</param>
+        /// <param name="mingelBingoCards">Values to insert into the sheet instead of the placeholders.</param>
         /// <exception cref="PlaceholderCountMismatchException">Thrown when values count doesn't match number of placeholders in sheet.</exception>
-        public Task ReplacePlaceholderWithValues(string sheetId, string sheetName, string placeholderValue, List<string> values);
+        public Task<bool> ReplacePlaceholderWithValues(SpreadSheet spreadSheet, string placeholderValue, List<MingelBingoCard> mingelBingoCards);
+
+        /// <summary>
+        /// Creates a copy of a spreadsheet.
+        /// </summary>
+        /// <param name="originalSheetId"></param>
+        /// <param name="newName"></param>
+        public Task<SpreadSheet> CopyFile(string originalSheetId, string newName);
     }
 }

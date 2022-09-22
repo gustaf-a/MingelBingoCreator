@@ -3,7 +3,9 @@
     internal class SpreadSheet
     {
         public string Id { get; set; }
-        public List<string> Sheets { get; set; }
-        public object Name { get; internal set; }
+        public string Name { get; set; }
+        public int TemplateSheetId { get; set; }
+        public List<int> SheetIds { get; set; }
+        public List<string> SheetNames { get; set; }
     }
 }

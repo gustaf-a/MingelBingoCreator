@@ -1,6 +1,7 @@
 ﻿using MingelBingoCreator.Configurations;
 using MingelBingoCreator.Data;
 using MingelBingoCreator.Repository;
+using Serilog;
 
 namespace MingelBingoCreator.FinalFileGenerator
 {
@@ -17,19 +18,41 @@ namespace MingelBingoCreator.FinalFileGenerator
 
         internal SpreadSheet CreateFinalFile(List<MingelBingoCard> mingelBingoCards)
         {
-            var result = _repository.CopyFile(_appSettings.GoogleSheetsOptions.TemplateSheetId, CreateNewFileName());
+            try
+            {
+                var createFinalFileTask = Task.Run(async () => await CreateFinalFileAsync(mingelBingoCards));
 
-            throw new NotImplementedException();
-            //Send board objects to copy of template sheet
+                createFinalFileTask.Wait();
 
+                return createFinalFileTask.Result;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Exception encountered when creating final file: {ex.Message}");
 
-            //remove template tab from template sheet
+                throw;
+            }
+        }
 
+        private async Task<SpreadSheet> CreateFinalFileAsync(List<MingelBingoCard> mingelBingoCards)
+        {
+            var newSpreadSheet = await _repository.CopyFile(_appSettings.GoogleSheetsOptions.TemplateSheetId, CreateNewFileName());
+
+            if (newSpreadSheet == null)
+                throw new Exception("Failed to copy template file with sheets. Null result returned from repository.");
+
+            var templateSpreadSheet = await _repository.CreateMingelBingoCardsFromTemplateSheet(newSpreadSheet, mingelBingoCards.Count);
+
+            var result = await _repository.ReplacePlaceholderWithValues(templateSpreadSheet, _appSettings.GoogleSheetsOptions.PlaceHolderValue, mingelBingoCards);
+
+            //TODO Handle result
+
+            return templateSpreadSheet;
         }
 
         private string CreateNewFileName()
         {
-            var dateSuffix = DateTime.Now.ToString("MM-dd_HH-mm");
+            var dateSuffix = DateTime.Now.ToString("MMdd_HHmm");
 
             return $"{_appSettings.ExportOptions.FinalFileName}_{dateSuffix}";
         }
