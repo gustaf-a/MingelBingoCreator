@@ -7,5 +7,8 @@ namespace MingelBingoCreator.Configurations
     {
         [JsonProperty(Required = Required.Always)]
         public int NumberOfCards { get; private set; }
+
+        [JsonProperty(Required = Required.Always)]
+        public object FinalFileName { get; private set; }
     }
 }
