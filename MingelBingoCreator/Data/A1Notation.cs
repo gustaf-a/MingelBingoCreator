@@ -3,7 +3,7 @@
     internal class A1Notation
     {
         public string A1NotationString { get; set; }
-        public int RangeRows { get; set; }
-        public int RangeColumns { get; set; }
+        public int NumberOfRows { get; set; }
+        public int NumberOfColumns { get; set; }
     }
 }

@@ -8,14 +8,10 @@ namespace MingeBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTests
     public static class A1NotationCreatorTests
     {
         [Theory]
-        [InlineData(1, 1, 'A')]
-        [InlineData(4, 2, 'B')]
-        [InlineData(2, 3, 'C')]
-        [InlineData(8, 4, 'D')]
-        [InlineData(5, 5, 'E')]
-        [InlineData(7, 6, 'F')]
-        [InlineData(10, 7, 'G')]
-        [InlineData(60, 26, 'Z')]
+        [InlineData(0, 0, 'A')]
+        [InlineData(1, 2, 'C')]
+        [InlineData(7, 5, 'F')]
+        [InlineData(60, 25, 'Z')]
         public static void GetA1NotationString_GetsCorrectCharacter(int row, int column, char character)
         {
             //Arrange
@@ -27,12 +23,10 @@ namespace MingeBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTests
 
             var sheetName = "test";
 
-            var expected = sheetName + "!" + character + row.ToString();
-
-
+            var expected = sheetName + "!" + character + (row + 1).ToString();
 
             //Act
-            var result = A1NotationCreator.GetA1NotationForSingleCell(sheetName, cell);
+            var result = A1NotationCreator.GetA1NotationStringForSingleCell(sheetName, cell);
 
             //Assert
             Assert.Equal(expected, result);
@@ -50,18 +44,18 @@ namespace MingeBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTests
             };
 
             //Act and Assert
-            Assert.Throws<NotSupportedException>(() => A1NotationCreator.GetA1NotationForSingleCell("test", cell));
+            Assert.Throws<NotSupportedException>(() => A1NotationCreator.GetA1NotationStringForSingleCell("test", cell));
         }
 
         [Theory]
-        [InlineData(1, 1, 1, 1, "A1:A1")]
-        [InlineData(1, 1, 4, 4, "A1:D4")]
-        [InlineData(2, 2, 5, 5, "B2:E5")]
-        [InlineData(1, 2, 1, 2, "B1:B1")]
-        [InlineData(1, 1, 1, 2, "A1:B1")]
-        [InlineData(1, 1, 2, 1, "A1:A2")]
-        [InlineData(2, 2, 2, 5, "B2:E2")]
-        [InlineData(6, 6, 20, 6, "F6:F20")]
+        [InlineData(0, 0, 0, 0, "A1:A1")]
+        [InlineData(0, 0, 3, 3, "A1:D4")]
+        [InlineData(1, 1, 4, 4, "B2:E5")]
+        [InlineData(0, 1, 0, 1, "B1:B1")]
+        [InlineData(0, 0, 0, 1, "A1:B1")]
+        [InlineData(0, 0, 1, 0, "A1:A2")]
+        [InlineData(1, 1, 1, 4, "B2:E2")]
+        [InlineData(5, 5, 19, 5, "F6:F20")]
         public static void GetA1NotationsForCells_CreatesCorrectRanges(int startRow, int startColumn, int endRow, int endColumn, string expectedNotation)
         {
             //Arrange
@@ -97,9 +91,41 @@ namespace MingeBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTests
             Assert.Equal($"{sheetName}!{expectedNotation}", resultNotation.A1NotationString);
         }
 
-        //Single cell range
-        //Single row range
-        //Single column range
+        [Theory]
+        [InlineData(1, 1, 1, 1)]
+        [InlineData(3, 4, 3, 4)]
+        [InlineData(1, 1, 2, 2)]
+        [InlineData(1, 1, 1, 2)]
+        [InlineData(1, 1, 2, 1)]
+        [InlineData(4, 1, 5, 3)]
+        public static void GetA1NotationsForCells_ReturnsCorrectRowAndColumnSize(int startRow, int startColumn, int endRow, int endColumn)
+        {
+            //Arrange
+            var foundCells = new List<List<Cell>>();
+
+            for (int i = startRow; i < endRow + 1; i++)
+            {
+                foundCells.Add(new List<Cell>());
+
+                for (int j = startColumn; j < endColumn + 1; j++)
+                    foundCells.Last().Add(new Cell
+                    {
+                        RowIndex = i,
+                        ColumnIndex = j
+                    });
+            }
+
+            //Act
+            var result = A1NotationCreator.GetA1NotationsForCells(foundCells, "testName");
+
+            //Assert
+            Assert.Single(result);
+
+            var resultNotation = result.First();
+
+            Assert.Equal(foundCells.Count, resultNotation.NumberOfRows);
+            Assert.Equal(foundCells.First().Count, resultNotation.NumberOfColumns);
+        }
 
         [Fact]
         public static void GetA1NotationsForCells_Throws_NotSupported_If_CellsNotContinuousMatrix()
