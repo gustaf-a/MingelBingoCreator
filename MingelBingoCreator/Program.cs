@@ -21,7 +21,8 @@ namespace MingelBingoCreator
 
             var dataGatherer = new GoogleSheetsDataGatherer(appSettings, repository);
 
-            var cardsCreator = new MingelBingoValuesGenerator(ValueSelectorFactory.SelectorMethod.Random);
+            //TODO Manage from options
+            var cardsCreator = new MingelBingoValuesGenerator(ValueSelectorFactory.SelectorMethod.Tagged);
 
             var finalFileGenerator = new FinalSpreadSheetGenerator(appSettings, repository);
 

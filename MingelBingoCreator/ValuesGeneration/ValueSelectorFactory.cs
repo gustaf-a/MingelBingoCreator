@@ -8,7 +8,8 @@ namespace MingelBingoCreator.ValuesGeneration
 
         public enum SelectorMethod
         {
-            Random
+            Random,
+            Tagged
         }
 
         public ValueSelectorFactory(SelectorMethod selectorMethod)
@@ -17,16 +18,15 @@ namespace MingelBingoCreator.ValuesGeneration
         }
 
         public IValueSelector Build(MingelBingoData mingelBingoData)
-        {
-            switch (_selectorMethod)
+            => _selectorMethod switch
             {
-                case SelectorMethod.Random:
-                    return new RandomValueSelector(mingelBingoData);
+                SelectorMethod.Random 
+                    => new RandomValueSelector(mingelBingoData.CellsInEachBoard, mingelBingoData.RawDataCategories),
 
-                default:
-                    throw new NotImplementedException($"Factory key not implemented: {_selectorMethod}");
-                    
-            }
-        }
+                SelectorMethod.Tagged 
+                    => new TaggedCategoriesValueSelector(mingelBingoData.CellsInEachBoard, mingelBingoData.RawDataCategories),
+
+                _ => throw new NotImplementedException($"Factory key not implemented: {_selectorMethod}"),
+            };
     }
 }

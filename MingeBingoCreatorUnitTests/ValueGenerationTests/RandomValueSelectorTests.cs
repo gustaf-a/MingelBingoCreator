@@ -21,9 +21,7 @@ namespace MingeBingoCreatorUnitTests.ValueGenerationTests
             testValues.Add(new Category("Heading 2", new List<string>{ "h2v1", "h2v2" }));
             testValues.Add(new Category("Heading 3", new List<string>{ "h3v1", "h3v2", "h3v3", "h3v4" }));
 
-            var mingelBingoData = new MingelBingoData(testValues, quantity);
-
-            var randomValueSelector = new RandomValueSelector(mingelBingoData);
+            var randomValueSelector = new RandomValueSelector(quantity, testValues);
 
             //Act
             var result = randomValueSelector.GetValues();
@@ -40,10 +38,8 @@ namespace MingeBingoCreatorUnitTests.ValueGenerationTests
             testValues.Add(new Category("Heading 1", new List<string>()));
             testValues.Add(new Category("Heading 2", new List<string>()));
 
-            var mingelBingoData = new MingelBingoData(testValues, 10);
-
             //Act and Assert
-            Assert.Throws<Exception>(() => new RandomValueSelector(mingelBingoData));
+            Assert.Throws<Exception>(() => new RandomValueSelector(10, testValues));
         }
 
         [Fact]
@@ -64,9 +60,7 @@ namespace MingeBingoCreatorUnitTests.ValueGenerationTests
                 testValues.Add(new Category($"Category {i}", values));
             }
 
-            var mingelBingoData = new MingelBingoData(testValues, totalValues);
-
-            var randomValueSelector = new RandomValueSelector(mingelBingoData);
+            var randomValueSelector = new RandomValueSelector(totalValues, testValues);
 
             //Act
             var result = randomValueSelector.GetValues();

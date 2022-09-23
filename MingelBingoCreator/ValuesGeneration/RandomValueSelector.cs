@@ -15,17 +15,17 @@ namespace MingelBingoCreator.ValuesGeneration
 
         private List<int> _indicesSelected;
 
-        public RandomValueSelector(MingelBingoData mingelBingoData)
+        public RandomValueSelector(int cellsToSelect, List<Category> categories)
         {
             _random = new Random();
 
-            _valuesPerSelection = mingelBingoData.CellsInEachBoard;
+            _valuesPerSelection = cellsToSelect;
 
             _values = new List<string>();
 
             _indicesSelected = new List<int>();
 
-            foreach (var category in mingelBingoData.RawDataCategories)
+            foreach (var category in categories)
                 _values.AddRange(category.Values);
 
             if (_values.Count == 0)
