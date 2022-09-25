@@ -13,20 +13,22 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
         [InlineData(10)]
         [InlineData(50)]
         [InlineData(100)]
-        public static void TaggedCategoriesValueSelector_returns_correct_quantity_with_UniqueValues(int quantity)
+        public static void TaggedCategoriesValueSelector_UniqueValues_returns_correct_quantity(int quantity)
         {
             //Arrange
-            var testValues = new List<Category>();
-            testValues.Add(new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }));
-            testValues.Add(new Category("Heading 2 #UniqueValuesPerBoard_1", new List<string> { "UniqueValuesPerBoard1" }));
-            testValues.Add(new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" }));
-            testValues.Add(new Category("Heading 4 #UniqueValuesPerBoard_2", new List<string> { "UniqueValuesPerBoard", "UniqueValuesPerBoard3" }));
+            var testValues = new List<Category>
+            {
+                new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }),
+                new Category("Heading 2 #UniqueValuesPerBoard_1", new List<string> { "UniqueValuesPerBoard1" }),
+                new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" }),
+                new Category("Heading 4 #UniqueValuesPerBoard_2", new List<string> { "UniqueValuesPerBoard", "UniqueValuesPerBoard3" })
+            };
 
-            var taggedValueSelector = new TaggedCategoriesValueSelector(quantity, testValues);
+            var taggedValueSelector = new TaggedCategoriesValueSelector(testValues);
 
             //Act
-            var result = taggedValueSelector.GetValues();
-            var result2 = taggedValueSelector.GetValues();
+            var result = taggedValueSelector.GetValues(quantity);
+            var result2 = taggedValueSelector.GetValues(quantity);
 
             //Assert
             Assert.Equal(quantity, result.Count);
@@ -47,20 +49,22 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
         [InlineData(10)]
         [InlineData(50)]
         [InlineData(100)]
-        public static void TaggedCategoriesValueSelector_returns_correct_quantity_with_OnEachBoard(int quantity)
+        public static void TaggedCategoriesValueSelector_returns_OnEachBoard_correct_quantity(int quantity)
         {
             //Arrange
-            var testValues = new List<Category>();
-            testValues.Add(new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }));
-            testValues.Add(new Category("Heading 2 #OnEachBoard_1", new List<string> { "OneEachBoard1" }));
-            testValues.Add(new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" }));
-            testValues.Add(new Category("Heading 4 #OnEachBoard_2", new List<string> { "OneEachBoard2", "OneEachBoard3" }));
+            var testValues = new List<Category>
+            {
+                new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }),
+                new Category("Heading 2 #OnEachBoard_1", new List<string> { "OneEachBoard1" }),
+                new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" }),
+                new Category("Heading 4 #OnEachBoard_2", new List<string> { "OneEachBoard2", "OneEachBoard3" })
+            };
 
-            var taggedValueSelector = new TaggedCategoriesValueSelector(quantity, testValues);
+            var taggedValueSelector = new TaggedCategoriesValueSelector(testValues);
 
             //Act
-            var result = taggedValueSelector.GetValues();
-            var result2 = taggedValueSelector.GetValues();
+            var result = taggedValueSelector.GetValues(quantity);
+            var result2 = taggedValueSelector.GetValues(quantity);
 
             //Assert
             Assert.Equal(quantity, result.Count);
@@ -81,37 +85,41 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
         [InlineData(10)]
         [InlineData(50)]
         [InlineData(100)]
-        public static void TaggedCategoriesValueSelector_returns_correct_quantity_if_no_tagged_categories(int quantity)
+        public static void TaggedCategoriesValueSelector_NoTagged_returns_correct_quantity(int quantity)
         {
             //Arrange
-            var testValues = new List<Category>();
-            testValues.Add(new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }));
-            testValues.Add(new Category("Heading 2", new List<string> { "h2v1", "h2v2" }));
-            testValues.Add(new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" }));
+            var testValues = new List<Category>
+            {
+                new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }),
+                new Category("Heading 2", new List<string> { "h2v1", "h2v2" }),
+                new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" })
+            };
 
-            var taggedValueSelector = new TaggedCategoriesValueSelector(quantity, testValues);
+            var taggedValueSelector = new TaggedCategoriesValueSelector(testValues);
 
             //Act
-            var result = taggedValueSelector.GetValues();
+            var result = taggedValueSelector.GetValues(quantity);
 
             //Assert
             Assert.Equal(quantity, result.Count);
         }
 
         [Fact]
-        public static void TaggedCategoriesValueSelector_throws_if_no_values_provided_if_no_tagged_categories()
+        public static void TaggedCategoriesValueSelector_NoTagged_throws_if_no_values_provided()
         {
             //Arrange
-            var testValues = new List<Category>();
-            testValues.Add(new Category("Heading 1", new List<string>()));
-            testValues.Add(new Category("Heading 2", new List<string>()));
+            var testValues = new List<Category>
+            {
+                new Category("Heading 1", new List<string>()),
+                new Category("Heading 2", new List<string>())
+            };
 
             //Act and Assert
-            Assert.Throws<Exception>(() => new TaggedCategoriesValueSelector(10, testValues));
+            Assert.Throws<Exception>(() => new TaggedCategoriesValueSelector(testValues));
         }
 
         [Fact]
-        public static void TaggedCategoriesValueSelector_returns_no_duplicates_if_enough_values_exist_if_no_tagged_categories()
+        public static void TaggedCategoriesValueSelector_NoTagged_returns_no_duplicates_if_enough_values_exist()
         {
             //Arrange
             var totalValues = 800;
@@ -128,10 +136,10 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
                 testValues.Add(new Category($"Category {i}", values));
             }
 
-            var taggedValueSelector = new TaggedCategoriesValueSelector(totalValues, testValues);
+            var taggedValueSelector = new TaggedCategoriesValueSelector(testValues);
 
             //Act
-            var result = taggedValueSelector.GetValues();
+            var result = taggedValueSelector.GetValues(totalValues);
 
             //Assert
             Assert.Equal(totalValues, result.Count);

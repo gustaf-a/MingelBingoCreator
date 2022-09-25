@@ -9,17 +9,15 @@ namespace MingelBingoCreator.ValuesGeneration
     {
         private Random _random;
 
-        private int _valuesPerSelection;
-
         private readonly List<string> _values;
 
         private List<int> _indicesSelected;
 
-        public RandomValueSelector(int cellsToSelect, List<Category> categories)
+        private readonly int _cellsToAddToEachBoard;
+
+        public RandomValueSelector(List<Category> categories)
         {
             _random = new Random();
-
-            _valuesPerSelection = cellsToSelect;
 
             _values = new List<string>();
 
@@ -32,11 +30,24 @@ namespace MingelBingoCreator.ValuesGeneration
                 throw new Exception("No values to select from found.");
         }
 
+        public RandomValueSelector(List<Category> categories, int cellsToAddToEachBoard) : this(categories)
+        {
+            _cellsToAddToEachBoard = cellsToAddToEachBoard;
+        }
+
         public List<string> GetValues()
+        {
+            if (_cellsToAddToEachBoard == 0)
+                throw new Exception("Call to GetValues without argument requires values to return to be provided in construction of class.");
+            
+            return GetValues(_cellsToAddToEachBoard);
+        }
+
+        public List<string> GetValues(int numberOfValues)
         {
             var selectedValues = new List<string>();
 
-            for (int i = 0; i < _valuesPerSelection; i++)
+            for (int i = 0; i < numberOfValues; i++)
                 selectedValues.Add(_values[GetNextRandomIndex()]);
 
             return selectedValues;
@@ -59,5 +70,6 @@ namespace MingelBingoCreator.ValuesGeneration
 
             return nextIndex;
         }
+
     }
 }

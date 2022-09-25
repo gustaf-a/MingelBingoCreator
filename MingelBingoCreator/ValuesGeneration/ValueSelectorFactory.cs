@@ -17,14 +17,14 @@ namespace MingelBingoCreator.ValuesGeneration
             _selectorMethod = selectorMethod;
         }
 
-        public IValueSelector Build(MingelBingoData mingelBingoData)
+        public IValueSelector Build(List<Category> categories)
             => _selectorMethod switch
             {
                 SelectorMethod.Random 
-                    => new RandomValueSelector(mingelBingoData.CellsInEachBoard, mingelBingoData.RawDataCategories),
+                    => new RandomValueSelector(categories),
 
                 SelectorMethod.Tagged 
-                    => new TaggedCategoriesValueSelector(mingelBingoData.CellsInEachBoard, mingelBingoData.RawDataCategories),
+                    => new TaggedCategoriesValueSelector(categories),
 
                 _ => throw new NotImplementedException($"Factory key not implemented: {_selectorMethod}"),
             };

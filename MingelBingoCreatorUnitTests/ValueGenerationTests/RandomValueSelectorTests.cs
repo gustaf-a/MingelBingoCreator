@@ -10,18 +10,43 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
         [InlineData(1)]
         [InlineData(5)]
         [InlineData(9)]
+        public static void RandomValueSelector_returns_correct_quantity_through_argument(int quantity)
+        {
+            //Arrange
+            var testValues = new List<Category>
+            {
+                new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }),
+                new Category("Heading 2", new List<string> { "h2v1", "h2v2" }),
+                new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" })
+            };
+
+            var randomValueSelector = new RandomValueSelector(testValues);
+
+            //Act
+            var result = randomValueSelector.GetValues(quantity);
+
+            //Assert
+            Assert.Equal(quantity, result.Count);
+        }
+
+        [Theory]
+        [InlineData(1)]
+        [InlineData(5)]
+        [InlineData(9)]
         [InlineData(10)]
         [InlineData(50)]
         [InlineData(100)]
-        public static void RandomValueSelector_returns_correct_quantity(int quantity)
+        public static void RandomValueSelector_returns_correct_quantity_through_constructor(int quantity)
         {
             //Arrange
-            var testValues = new List<Category>();
-            testValues.Add(new Category("Heading 1", new List<string>{ "h1v1", "h1v2", "h1v3" }));
-            testValues.Add(new Category("Heading 2", new List<string>{ "h2v1", "h2v2" }));
-            testValues.Add(new Category("Heading 3", new List<string>{ "h3v1", "h3v2", "h3v3", "h3v4" }));
+            var testValues = new List<Category>
+            {
+                new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }),
+                new Category("Heading 2", new List<string> { "h2v1", "h2v2" }),
+                new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" })
+            };
 
-            var randomValueSelector = new RandomValueSelector(quantity, testValues);
+            var randomValueSelector = new RandomValueSelector(testValues, quantity);
 
             //Act
             var result = randomValueSelector.GetValues();
@@ -34,12 +59,14 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
         public static void RandomValueSelector_throws_if_no_values_provided()
         {
             //Arrange
-            var testValues = new List<Category>();
-            testValues.Add(new Category("Heading 1", new List<string>()));
-            testValues.Add(new Category("Heading 2", new List<string>()));
+            var testValues = new List<Category>
+            {
+                new Category("Heading 1", new List<string>()),
+                new Category("Heading 2", new List<string>())
+            };
 
             //Act and Assert
-            Assert.Throws<Exception>(() => new RandomValueSelector(10, testValues));
+            Assert.Throws<Exception>(() => new RandomValueSelector(testValues));
         }
 
         [Fact]
@@ -60,10 +87,10 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
                 testValues.Add(new Category($"Category {i}", values));
             }
 
-            var randomValueSelector = new RandomValueSelector(totalValues, testValues);
+            var randomValueSelector = new RandomValueSelector(testValues);
 
             //Act
-            var result = randomValueSelector.GetValues();
+            var result = randomValueSelector.GetValues(800);
 
             //Assert
             Assert.Equal(totalValues, result.Count);

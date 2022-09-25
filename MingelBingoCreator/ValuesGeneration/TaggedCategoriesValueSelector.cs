@@ -3,55 +3,59 @@
 namespace MingelBingoCreator.ValuesGeneration
 {
     /// <summary>
-    /// Accepts tags on headings in data document.
-    /// For example:
-    /// heading text #OnEachBoard_1
-    /// This ensure exactly one from this category is put on each card.
+    /// Accepts tags on category headings in data document which controls how to add.
     /// </summary>
     internal class TaggedCategoriesValueSelector : IValueSelector
     {
-        private List<IValueSelector> _valueSelectors;
+        private readonly List<IValueSelector> _taggedValueSelectors;
 
-        private int _valuesPerSelection;
+        private readonly IValueSelector _fillerValueSelector;
 
-        private int _valuesFromTaggedCategories;
+        private readonly int _cellsToAddToEachBoard;
 
-        public TaggedCategoriesValueSelector(int cellsToSelect, List<Category> categories)
+        private static readonly Random random = new();
+
+        public TaggedCategoriesValueSelector(List<Category> categories)
         {
-            _valueSelectors = new List<IValueSelector>();
+            _taggedValueSelectors = new List<IValueSelector>();
 
-            _valuesPerSelection = cellsToSelect;
-
-            _valuesFromTaggedCategories = 0;
-
-            var categoriesToSelectRandomly = new List<Category>();
+            var fillerCategories = new List<Category>();
 
             for (int i = 0; i < categories.Count; i++)
             {
                 var category = categories[i];
 
-                if (IsCategory("OnEachBoard", category))
+                if (IsCategory(TaggedCategoriesTags.OnEachBoard, category))
                 {
                     var cellsToAddToEachBoard = GetArgument(category.Heading);
 
-                    _valueSelectors.Add(new RandomValueSelector(cellsToAddToEachBoard, new List<Category> { category }));
+                    _taggedValueSelectors.Add(new RandomValueSelector(new List<Category> { category }, cellsToAddToEachBoard));
 
-                    _valuesFromTaggedCategories += cellsToAddToEachBoard;
+                    continue;
+                }
+                else if (IsCategory(TaggedCategoriesTags.UniquePerBoard, category))
+                {
+                    var cellsToAddToEachBoard = GetArgument(category.Heading);
+
+                    _taggedValueSelectors.Add(new UniqueValueSelector(new List<Category> { category }, cellsToAddToEachBoard));
 
                     continue;
                 }
 
-                //TODO Implement unique tag if (HasUniqueTag())
-
-                categoriesToSelectRandomly.Add(category);
+                fillerCategories.Add(category);
             }
 
-            _valueSelectors.Add(new RandomValueSelector(_valuesPerSelection - _valuesFromTaggedCategories, categoriesToSelectRandomly));
+            _fillerValueSelector = new RandomValueSelector(fillerCategories);
         }
 
-        private int GetArgument(string heading)
+        public TaggedCategoriesValueSelector(List<Category> categories, int cellsToAddToEachBoard) : this(categories)
         {
-            var splitHeading = heading.Split("#") ?? new string[0];
+            _cellsToAddToEachBoard = cellsToAddToEachBoard;
+        }
+
+        private static int GetArgument(string heading)
+        {
+            var splitHeading = heading.Split(TaggedCategoriesTags.BeforeTagsSymbol) ?? Array.Empty<string>();
 
             if (splitHeading.Length != 2)
                 throw new Exception("Incorrect tag values. Don't put more than one # in category heading.");
@@ -59,28 +63,36 @@ namespace MingelBingoCreator.ValuesGeneration
             //TODO safety
             var tag = splitHeading[1];
 
-            return int.Parse(tag.Split("_")[1]);
+            return int.Parse(tag.Split(TaggedCategoriesTags.ArgumentSplitCharacter)[1]);
         }
 
         private static bool IsCategory(string categoryKey, Category category)
-            => category.Heading.ToLower().Contains(categoryKey.ToLower());
-
+            => category.Heading.ToLower().Contains($"{TaggedCategoriesTags.BeforeTagsSymbol}{categoryKey.ToLower()}");
+       
         public List<string> GetValues()
+        {
+            if (_cellsToAddToEachBoard == 0)
+                throw new Exception("Call to GetValues without argument requires values to return to be provided in construction of class.");
+
+            return GetValues(_cellsToAddToEachBoard);
+        }
+
+        public List<string> GetValues(int numberOfValues)
         {
             var values = new List<string>();
 
-            foreach (var valueSelector in _valueSelectors)
+            foreach (var valueSelector in _taggedValueSelectors)
                 values.AddRange(valueSelector.GetValues());
 
-            if (values.Count != _valuesPerSelection)
+            values.AddRange(_fillerValueSelector.GetValues(numberOfValues - values.Count));
+
+            if (values.Count != numberOfValues)
                 throw new Exception("Failed to collect the correct amount of values.");
 
             Shuffle(values);
 
             return values;
         }
-
-        private static Random random = new Random();
 
         private static void Shuffle(List<string> list)
         {
@@ -92,11 +104,7 @@ namespace MingelBingoCreator.ValuesGeneration
 
                 n--;
 
-                var value = list[k];
-
-                list[k] = list[n];
-
-                list[n] = value;
+                (list[k], list[n]) = (list[n], list[k]);
             }
         }
     }
