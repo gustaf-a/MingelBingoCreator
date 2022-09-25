@@ -70,6 +70,5 @@ namespace MingelBingoCreator.ValuesGeneration
 
             return nextIndex;
         }
-
     }
 }

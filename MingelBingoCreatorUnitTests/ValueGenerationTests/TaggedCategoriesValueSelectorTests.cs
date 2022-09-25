@@ -27,6 +27,7 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
             var result = taggedValueSelector.GetValues(quantity);
             var result2 = taggedValueSelector.GetValues(quantity);
 
+            
             //Assert
             Assert.Equal(quantity, result.Count);
             Assert.Equal(1, result.Count(r => r == "UniqueValuesPerBoard1"));
