@@ -10,18 +10,15 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
         [InlineData(3)]
         [InlineData(5)]
         [InlineData(9)]
-        [InlineData(10)]
-        [InlineData(50)]
-        [InlineData(100)]
         public static void TaggedCategoriesValueSelector_UniqueValues_returns_correct_quantity(int quantity)
         {
             //Arrange
             var testValues = new List<Category>
             {
                 new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }),
-                new Category("Heading 2 #UniqueValuesPerBoard_1", new List<string> { "UniqueValuesPerBoard1" }),
+                new Category("Heading 2 #UniquePerBoard_1", new List<string> { "UniqueValuesPerBoard1" }),
                 new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" }),
-                new Category("Heading 4 #UniqueValuesPerBoard_2", new List<string> { "UniqueValuesPerBoard", "UniqueValuesPerBoard3" })
+                new Category("Heading 4 #UniquePerBoard_2", new List<string> { "UniqueValuesPerBoard2", "UniqueValuesPerBoard3" })
             };
 
             var taggedValueSelector = new TaggedCategoriesValueSelector(testValues);
@@ -37,9 +34,9 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
             Assert.Equal(1, result.Count(r => r == "UniqueValuesPerBoard3"));
 
             Assert.Equal(quantity, result2.Count);
-            Assert.DoesNotContain("UniqueValuesPerBoard1", result);
-            Assert.DoesNotContain("UniqueValuesPerBoard2", result);
-            Assert.DoesNotContain("UniqueValuesPerBoard3", result);
+            Assert.DoesNotContain("UniqueValuesPerBoard1", result2);
+            Assert.DoesNotContain("UniqueValuesPerBoard2", result2);
+            Assert.DoesNotContain("UniqueValuesPerBoard3", result2);
         }
 
         [Theory]
