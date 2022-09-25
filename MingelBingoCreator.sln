@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32901.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MingelBingoCreator", "MingelBingoCreator\MingelBingoCreator.csproj", "{64B4F0F9-FFD4-4626-8BA3-7BB92097460B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MingeBingoCreatorUnitTests", "MingeBingoCreatorUnitTests\MingeBingoCreatorUnitTests.csproj", "{DFE4277B-B93C-4981-95E1-123F33ADF6B8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MingelBingoCreatorUnitTests", "MingelBingoCreatorUnitTests\MingelBingoCreatorUnitTests.csproj", "{DFE4277B-B93C-4981-95E1-123F33ADF6B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

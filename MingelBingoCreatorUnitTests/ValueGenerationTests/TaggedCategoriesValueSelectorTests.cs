@@ -2,7 +2,7 @@
 using MingelBingoCreator.ValuesGeneration;
 using Xunit;
 
-namespace MingeBingoCreatorUnitTests.ValueGenerationTests
+namespace MingelBingoCreatorUnitTests.ValueGenerationTests
 {
     public static class TaggedCategoriesValueSelectorTests
     {

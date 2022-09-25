@@ -2,7 +2,7 @@
 using MingelBingoCreator.Repository.GoogleSheetsHelpers;
 using Xunit;
 
-namespace MingeBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTests
+namespace MingelBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTests
 {
     public static class ValueRangeCreatorTests
     {

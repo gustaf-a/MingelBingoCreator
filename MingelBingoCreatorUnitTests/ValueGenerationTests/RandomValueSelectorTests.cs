@@ -2,7 +2,7 @@
 using MingelBingoCreator.Data;
 using MingelBingoCreator.ValuesGeneration;
 
-namespace MingeBingoCreatorUnitTests.ValueGenerationTests
+namespace MingelBingoCreatorUnitTests.ValueGenerationTests
 {
     public static class RandomValueSelectorTests
     {

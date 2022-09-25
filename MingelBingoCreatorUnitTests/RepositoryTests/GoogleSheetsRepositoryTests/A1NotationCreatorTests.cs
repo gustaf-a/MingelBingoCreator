@@ -3,7 +3,7 @@ using MingelBingoCreator.Repository.GoogleSheetsHelpers;
 using System.Data.Common;
 using Xunit;
 
-namespace MingeBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTests
+namespace MingelBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTests
 {
     public static class A1NotationCreatorTests
     {
