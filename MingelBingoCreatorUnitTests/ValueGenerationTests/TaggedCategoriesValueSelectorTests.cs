@@ -53,27 +53,28 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
             var testValues = new List<Category>
             {
                 new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }),
-                new Category("Heading 2 #OnEachBoard_1", new List<string> { "OneEachBoard1" }),
+                new Category("Heading 2 #OnEachBoard_1", new List<string> { "OnEachBoard1" }),
                 new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" }),
-                new Category("Heading 4 #OnEachBoard_2", new List<string> { "OneEachBoard2", "OneEachBoard3" })
+                new Category("Heading 4 #OnEachBoard_2", new List<string> { "OnEachBoard2", "OnEachBoard3" })
             };
 
             var taggedValueSelector = new TaggedCategoriesValueSelector(testValues);
 
             //Act
             var result = taggedValueSelector.GetValues(quantity);
+            
             var result2 = taggedValueSelector.GetValues(quantity);
 
             //Assert
             Assert.Equal(quantity, result.Count);
-            Assert.Equal(1, result.Count(r => r == "OneEachBoard1"));
-            Assert.Equal(1, result.Count(r => r == "OneEachBoard2"));
-            Assert.Equal(1, result.Count(r => r == "OneEachBoard3"));
+            Assert.Equal(1, result.Count(r => r == "OnEachBoard1"));
+            Assert.Equal(1, result.Count(r => r == "OnEachBoard2"));
+            Assert.Equal(1, result.Count(r => r == "OnEachBoard3"));
 
             Assert.Equal(quantity, result2.Count);
-            Assert.Equal(1, result2.Count(r => r == "OneEachBoard1"));
-            Assert.Equal(1, result2.Count(r => r == "OneEachBoard2"));
-            Assert.Equal(1, result2.Count(r => r == "OneEachBoard3"));
+            Assert.Equal(1, result2.Count(r => r == "OnEachBoard1"));
+            Assert.Equal(1, result2.Count(r => r == "OnEachBoard2"));
+            Assert.Equal(1, result2.Count(r => r == "OnEachBoard3"));
         }
 
         [Theory]
