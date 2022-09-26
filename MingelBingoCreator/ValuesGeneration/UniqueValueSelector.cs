@@ -2,45 +2,15 @@
 
 namespace MingelBingoCreator.ValuesGeneration
 {
-    internal class UniqueValueSelector : IValueSelector
+    internal class UniqueValueSelector : SingleCategoryValueSelector
     {
-        private readonly Random _random;
-
-        private readonly List<string> _values;
-
-        private readonly int _cellsToAddToEachBoard;
-
-        private List<int> _indicesSelected;
-
         public UniqueValueSelector(List<Category> categories)
-        {
-            _random = new Random();
+            : base(categories) { }
 
-            _indicesSelected = new();
+        public UniqueValueSelector(List<Category> categories, int cellsToAddToEachBoard)
+            : base(categories, cellsToAddToEachBoard) { }
 
-            _values = new();
-
-            foreach (var category in categories)
-                _values.AddRange(category.Values);
-
-            if (_values.Count == 0)
-                throw new Exception("No values to select from found.");
-        }
-
-        public UniqueValueSelector(List<Category> categories, int cellsToAddToEachBoard) : this(categories)
-        {
-            _cellsToAddToEachBoard = cellsToAddToEachBoard;
-        }
-
-        public List<string> GetValues()
-        {
-            if (_cellsToAddToEachBoard == 0)
-                throw new Exception("Call to GetValues without argument requires values to return to be provided in construction of class.");
-
-            return GetValues(_cellsToAddToEachBoard);
-        }
-
-        public List<string> GetValues(int numberOfValues)
+        public override List<string> GetValues(int numberOfValues)
         {
             var selectedValues = new List<string>();
 
@@ -53,21 +23,6 @@ namespace MingelBingoCreator.ValuesGeneration
             }
 
             return selectedValues;
-        }
-
-        private int GetNextRandomIndex()
-        {
-            int nextIndex;
-
-            do
-            {
-                nextIndex = _random.Next(_values.Count);
-
-            } while (_indicesSelected.Contains(nextIndex));
-
-            _indicesSelected.Add(nextIndex);
-
-            return nextIndex;
         }
     }
 }
