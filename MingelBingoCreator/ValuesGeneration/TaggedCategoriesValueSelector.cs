@@ -1,4 +1,5 @@
 ﻿using MingelBingoCreator.Data;
+using Serilog;
 
 namespace MingelBingoCreator.ValuesGeneration
 {
@@ -23,26 +24,10 @@ namespace MingelBingoCreator.ValuesGeneration
 
             for (int i = 0; i < categories.Count; i++)
             {
-                var category = categories[i];
-
-                if (IsCategory(TaggedCategoriesTags.OnEachBoard, category))
-                {
-                    var cellsToAddToEachBoard = GetArgument(category.Heading);
-
-                    _taggedValueSelectors.Add(new RandomValueSelector(new List<Category> { category }, cellsToAddToEachBoard));
-
-                    continue;
-                }
-                else if (IsCategory(TaggedCategoriesTags.UniquePerBoard, category))
-                {
-                    var cellsToAddToEachBoard = GetArgument(category.Heading);
-
-                    _taggedValueSelectors.Add(new UniqueValueSelector(new List<Category> { category }, cellsToAddToEachBoard));
-
-                    continue;
-                }
-
-                fillerCategories.Add(category);
+                if (TryGetValueSelectorForCategory(categories[i], out var valueSelector))
+                    _taggedValueSelectors.Add(valueSelector);
+                else
+                    fillerCategories.Add(categories[i]);
             }
 
             _fillerValueSelector = new RandomValueSelector(fillerCategories);
@@ -53,22 +38,93 @@ namespace MingelBingoCreator.ValuesGeneration
             _cellsToAddToEachBoard = cellsToAddToEachBoard;
         }
 
-        private static int GetArgument(string heading)
+        private static bool TryGetValueSelectorForCategory(Category category, out IValueSelector? valueSelector)
         {
-            var splitHeading = heading.Split(TaggedCategoriesTags.BeforeTagsSymbol) ?? Array.Empty<string>();
+            valueSelector = null;
 
-            if (splitHeading.Length != 2)
-                throw new Exception("Incorrect tag values. Don't put more than one # in category heading.");
+            if (!TryFindTaggedCategory(category, out var taggedCategory))
+                return false;
 
-            //TODO safety
-            var tag = splitHeading[1];
+            switch (taggedCategory.Category)
+            {
+                case TaggedCategoriesTags.Tags.OnEachBoard:
+                    valueSelector = new RandomValueSelector(new List<Category> { category }, taggedCategory.Argument);
+                    return true;
 
-            return int.Parse(tag.Split(TaggedCategoriesTags.ArgumentSplitCharacter)[1]);
+                case TaggedCategoriesTags.Tags.UniquePerBoard:
+                    valueSelector = new UniqueValueSelector(new List<Category> { category }, taggedCategory.Argument);
+                    return true;
+
+                case TaggedCategoriesTags.Tags.None:
+                    //Let fall through to default
+                default:
+                    Log.Warning($"Failed to parse category from heading. Ignoring heading tags for: {category.Heading}");
+                    return false;
+            }
         }
 
-        private static bool IsCategory(string categoryKey, Category category)
-            => category.Heading.ToLower().Contains($"{TaggedCategoriesTags.BeforeTagsSymbol}{categoryKey.ToLower()}");
-       
+        private static bool TryFindTaggedCategory(Category category, out TaggedCategory taggedCategory)
+        {
+            taggedCategory = null;
+
+            if (!category.Heading.Contains(TaggedCategoriesTags.BeforeTagsSymbol))
+                return false;
+
+            var splitHeading = category.Heading.Split(TaggedCategoriesTags.BeforeTagsSymbol);
+
+            var tagPartOfHeading = splitHeading[1];
+            if (string.IsNullOrWhiteSpace(tagPartOfHeading))
+                return false;
+
+            if (!TryGetArgument(tagPartOfHeading, out var foundArgument))
+            {
+                Log.Error($"Failed to find argument for tagged category: {tagPartOfHeading}. Ignoring category tag for values.");
+                return false;
+            }
+
+            var categoryTag = GetCategoryTag(tagPartOfHeading);
+
+            taggedCategory = new TaggedCategory(category.Heading, category.Values, categoryTag, foundArgument);
+
+            return true;
+        }
+
+        private static TaggedCategoriesTags.Tags GetCategoryTag(string tagPartOfHeading)
+        {
+            if (ContainsTag(tagPartOfHeading, TaggedCategoriesTags.Tags.UniquePerBoard))
+                return TaggedCategoriesTags.Tags.UniquePerBoard;
+
+            else if (ContainsTag(tagPartOfHeading, TaggedCategoriesTags.Tags.OnEachBoard))
+                return TaggedCategoriesTags.Tags.OnEachBoard;
+
+            else
+                return TaggedCategoriesTags.Tags.None;
+        }
+
+        private static bool ContainsTag(string stringValue, TaggedCategoriesTags.Tags tag)
+            => stringValue.ToLower().Contains(tag.ToString(), StringComparison.InvariantCultureIgnoreCase);
+
+        private static bool TryGetArgument(string tagPartOfHeading, out int argument)
+        {
+            argument = 0;
+
+            var splitTagPartOfHeading = tagPartOfHeading.Split(TaggedCategoriesTags.ArgumentSplitCharacter);
+
+            if (splitTagPartOfHeading.Length != 2)
+            {
+                Log.Warning($"Incorrect tag values. Don't put more than one # in category heading: '{tagPartOfHeading}'");
+                return false;
+            }
+
+            if (!int.TryParse(splitTagPartOfHeading[1], out argument))
+            {
+                Log.Warning($"Failed to parse argument part of category tag: {splitTagPartOfHeading[1]} ");
+                return false;
+            }
+
+            return true;
+        }
+
         public List<string> GetValues()
         {
             if (_cellsToAddToEachBoard == 0)
