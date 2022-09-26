@@ -9,9 +9,12 @@ namespace MingelBingoCreator.ValuesGeneration
 
         public enum Tags
         {
-            None,
-            OnEachBoard,
-            UniquePerBoard
+            None = 0,
+            OnEachBoard = 1,
+            UniquePerBoard = 2,
+            Ignore = 4,
+
+            NeedsArguments = OnEachBoard | UniquePerBoard
         }
     }
 }

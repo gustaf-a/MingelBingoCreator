@@ -78,6 +78,33 @@ namespace MingelBingoCreatorUnitTests.ValueGenerationTests
         }
 
         [Theory]
+        [InlineData(7)]
+        [InlineData(9)]
+        public static void TaggedCategoriesValueSelector_Ignore_returns_correct_quantity(int quantity)
+        {
+            //Arrange
+            var testValues = new List<Category>
+            {
+                new Category("Heading 1", new List<string> { "h1v1", "h1v2", "h1v3" }),
+                new Category("Heading 2 #Ignore", new List<string> { "OnEachBoard1" }),
+                new Category("Heading 3", new List<string> { "h3v1", "h3v2", "h3v3", "h3v4" }),
+                new Category("Heading 4 #Ignore", new List<string> { "OnEachBoard2", "OnEachBoard3" })
+            };
+
+            var taggedValueSelector = new TaggedCategoriesValueSelector(testValues);
+
+            //Act
+            var result = taggedValueSelector.GetValues(quantity);
+
+            //Assert
+            Assert.Equal(quantity, result.Count);
+
+            Assert.DoesNotContain("OnEachBoard1", result);
+            Assert.DoesNotContain("OnEachBoard2", result);
+            Assert.DoesNotContain("OnEachBoard3", result);
+        }
+
+        [Theory]
         [InlineData(1)]
         [InlineData(5)]
         [InlineData(9)]

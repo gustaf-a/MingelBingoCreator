@@ -55,8 +55,12 @@ namespace MingelBingoCreator.ValuesGeneration
                     valueSelector = new UniqueValueSelector(new List<Category> { category }, taggedCategory.Argument);
                     return true;
 
+                case TaggedCategoriesTags.Tags.Ignore:
+                    valueSelector = new IgnoreValueSelector();
+                    return true;
+
                 case TaggedCategoriesTags.Tags.None:
-                    //Let fall through to default
+                //Let fall through to default
                 default:
                     Log.Warning($"Failed to parse category from heading. Ignoring heading tags for: {category.Heading}");
                     return false;
@@ -76,13 +80,18 @@ namespace MingelBingoCreator.ValuesGeneration
             if (string.IsNullOrWhiteSpace(tagPartOfHeading))
                 return false;
 
-            if (!TryGetArgument(tagPartOfHeading, out var foundArgument))
-            {
-                Log.Error($"Failed to find argument for tagged category: {tagPartOfHeading}. Ignoring category tag for values.");
-                return false;
-            }
-
             var categoryTag = GetCategoryTag(tagPartOfHeading);
+
+            int foundArgument = 0;
+
+            if (TaggedCategoriesTags.Tags.NeedsArguments.HasFlag(categoryTag))
+            {
+                if (!TryGetArgument(tagPartOfHeading, out foundArgument))
+                {
+                    Log.Error($"Failed to find argument for tagged category: {tagPartOfHeading}. Ignoring category tag for values.");
+                    return false;
+                }
+            }
 
             taggedCategory = new TaggedCategory(category.Heading, category.Values, categoryTag, foundArgument);
 
@@ -96,6 +105,9 @@ namespace MingelBingoCreator.ValuesGeneration
 
             else if (ContainsTag(tagPartOfHeading, TaggedCategoriesTags.Tags.OnEachBoard))
                 return TaggedCategoriesTags.Tags.OnEachBoard;
+
+            else if (ContainsTag(tagPartOfHeading, TaggedCategoriesTags.Tags.Ignore))
+                return TaggedCategoriesTags.Tags.Ignore;
 
             else
                 return TaggedCategoriesTags.Tags.None;
@@ -112,7 +124,7 @@ namespace MingelBingoCreator.ValuesGeneration
 
             if (splitTagPartOfHeading.Length != 2)
             {
-                Log.Warning($"Incorrect tag values. Don't put more than one # in category heading: '{tagPartOfHeading}'");
+                Log.Warning($"Incorrect tag values. Too many {TaggedCategoriesTags.ArgumentSplitCharacter} in category heading: '{tagPartOfHeading}'");
                 return false;
             }
 
