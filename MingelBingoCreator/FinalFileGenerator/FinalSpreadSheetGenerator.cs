@@ -45,7 +45,10 @@ namespace MingelBingoCreator.FinalFileGenerator
 
             var result = await _repository.ReplacePlaceholderWithValues(templateSpreadSheet, _appSettings.GoogleSheetsOptions.PlaceHolderValue, mingelBingoCards);
 
-            //TODO Handle result
+            if (result)
+                Log.Information("Updated placeholder values in final file successfully");
+            else
+                Log.Warning("Something went wrong when updating placeholder values. Please check final file manually.");
 
             return templateSpreadSheet;
         }

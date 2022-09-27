@@ -31,6 +31,8 @@ namespace MingelBingoCreator.ValuesGeneration
             }
 
             _fillerValueSelector = new RandomValueSelector(fillerCategories);
+
+            Log.Information("Value selectors created.");
         }
 
         public TaggedCategoriesValueSelector(List<Category> categories, int cellsToAddToEachBoard) : this(categories)

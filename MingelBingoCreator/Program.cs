@@ -30,14 +30,14 @@ namespace MingelBingoCreator
 
             //Gathering Data from data files and template files
             var mingelBingoData = dataGatherer.GatherData();
+            Log.Information("Gathered data.");
 
             //Creating list of values from the data based on template files and AppSettings
             var mingelBingoCards = cardsCreator.GetValues(appSettings, mingelBingoData);
+            Log.Information("Values for cards created.");
 
             //Creating a new file from template file and populating it with previously created values
             var finalFile = finalFileGenerator.CreateFinalFile(mingelBingoCards);
-
-            //----- Closure -----
             Log.Information($"Successfully created final file: {finalFile.Name}");
         }
 

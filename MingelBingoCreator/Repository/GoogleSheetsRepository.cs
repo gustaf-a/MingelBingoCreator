@@ -275,10 +275,11 @@ namespace MingelBingoCreator.Repository
                 ValueInputOption = "USER_ENTERED"
             };
 
-            var response = await _sheetsService.Spreadsheets.Values.BatchUpdate(requestBody, spreadSheet.Id).ExecuteAsync()
+            var batchUpdateResponse = await _sheetsService.Spreadsheets.Values.BatchUpdate(requestBody, spreadSheet.Id).ExecuteAsync()
                 ?? throw LogAndReturnException(new Exception($"Null response when trying to update placeholder values."));
 
-            //TODO Check (response.Replies);
+            if (batchUpdateResponse.TotalUpdatedSheets != spreadSheet.SheetIds.Count)
+                Log.Warning("Total count of updated sheets is different from expected. Please check tabs in final file.");
 
             return true;
         }
