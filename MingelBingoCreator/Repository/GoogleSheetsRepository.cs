@@ -6,9 +6,7 @@ using Google.Apis.Util.Store;
 using MingelBingoCreator.Configurations;
 using MingelBingoCreator.Data;
 using MingelBingoCreator.Repository.GoogleSheetsHelpers;
-using Newtonsoft.Json.Linq;
 using Serilog;
-using System.Xml.Serialization;
 
 namespace MingelBingoCreator.Repository
 {
@@ -118,7 +116,7 @@ namespace MingelBingoCreator.Repository
             return result;
         }
 
-        public async Task<SpreadSheet> CopyFile(string originalSpreadsheetId, string newName)
+        public async Task<TemplateSpreadSheet> CopyFile(string originalSpreadsheetId, string newName)
         {
             var sheetIdToCopy = await GetSheetIdToCopy(originalSpreadsheetId);
 
@@ -126,19 +124,18 @@ namespace MingelBingoCreator.Repository
 
             var copiedSheetId = await CopySheetToSpreadSheet(originalSpreadsheetId, sheetIdToCopy, createdSpreadSheet.SpreadsheetId);
 
-            //TODO Add Google Drive Permissions and service to move spreadsheet from root folder location of template 
-
             Log.Information($"Successfully created {newName} in Google Drive root folder by copying {originalSpreadsheetId}.");
 
-            var sheetIds = new List<int>();
-
-            sheetIds.Add(copiedSheetId);
+            var sheetIds = new List<int>
+            {
+                copiedSheetId
+            };
 
             foreach (var sheet in createdSpreadSheet.Sheets)
                 sheetIds.Add(sheet.Properties.SheetId
                     ?? throw LogAndReturnException(new Exception($"Null sheetId found in created spreadsheet: {createdSpreadSheet.SpreadsheetId}")));
 
-            return new SpreadSheet
+            return new TemplateSpreadSheet
             {
                 Id = createdSpreadSheet.SpreadsheetId,
                 Name = createdSpreadSheet.Properties.Title,
@@ -198,13 +195,13 @@ namespace MingelBingoCreator.Repository
                 ?? throw LogAndReturnException(new Exception($"Failed to find sheetId for destination spreadsheet's new sheet. Spreadsheet Id: {destinationSpreadSheetId}"));
         }
 
-        internal async Task<SpreadSheet> CreateMingelBingoCardsFromTemplateSheet(SpreadSheet spreadSheet, int numberOfCardsToCreate)
+        internal async Task<SpreadSheet> CreateDuplicateSheetTabsFromTemplateSheetTab(TemplateSpreadSheet spreadSheet, int numberOfCardsToCreate)
         {
             var requests = new List<Request>();
 
             requests.AddRange(GetDuplicateTemplateSheetRequests(spreadSheet, numberOfCardsToCreate));
 
-            //Removes the template sheet and automatically created Sheet1 which were in the original spreadsheet object.
+            //Removes the template sheet and the automatically created Sheet1 which were in the original spreadsheet object.
             requests.AddRange(GetRemoveAllSheetsRequests(spreadSheet));
 
             var batchUpdateRequestBody = new BatchUpdateSpreadsheetRequest
@@ -215,12 +212,10 @@ namespace MingelBingoCreator.Repository
 
             var batchUpdateRequest = _sheetsService.Spreadsheets.BatchUpdate(batchUpdateRequestBody, spreadSheet.Id);
 
-            var response = await batchUpdateRequest.ExecuteAsync()
+            var batchUpdateResponse = await batchUpdateRequest.ExecuteAsync()
                 ?? throw LogAndReturnException(new Exception($"Null response when trying to create cards"));
 
-            //TODO CheckRepliesForExceptions(response.Replies);
-
-            var updatedSpreadSheet = response.UpdatedSpreadsheet
+            var updatedSpreadSheet = batchUpdateResponse.UpdatedSpreadsheet
                 ?? throw LogAndReturnException(new Exception($"Null response when trying to create cards"));
 
             if (updatedSpreadSheet.Sheets.Count != numberOfCardsToCreate)
@@ -245,7 +240,7 @@ namespace MingelBingoCreator.Repository
             return requests;
         }
 
-        private static IEnumerable<Request> GetDuplicateTemplateSheetRequests(SpreadSheet spreadSheet, int numberOfCardsToCreate)
+        private static IEnumerable<Request> GetDuplicateTemplateSheetRequests(TemplateSpreadSheet spreadSheet, int numberOfCardsToCreate)
         {
             var requests = new List<Request>();
 
@@ -264,10 +259,12 @@ namespace MingelBingoCreator.Repository
 
         public async Task<bool> ReplacePlaceholderWithValues(SpreadSheet spreadSheet, string placeholderValue, List<MingelBingoCard> mingelBingoCards)
         {
+            await UpdateBingoCardsWithRangesFromFirstSheet(spreadSheet, mingelBingoCards, placeholderValue);
+
             var valueRanges = new List<ValueRange>();
 
             for (int i = 0; i < spreadSheet.SheetIds.Count; i++)
-                valueRanges.AddRange(await GetValueRangesForSheet(spreadSheet, mingelBingoCards, i, placeholderValue));
+                valueRanges.AddRange(ValueRangeCreator.CreateValueRangesForCard(mingelBingoCards[i].A1NotationRanges, mingelBingoCards[i].Values, spreadSheet.SheetNames[i]));
 
             var requestBody = new BatchUpdateValuesRequest
             {
@@ -284,14 +281,21 @@ namespace MingelBingoCreator.Repository
             return true;
         }
 
-        //TODO Value range is same for all sheets. Makes most sense to find for one sheet only.
-        private async Task<List<ValueRange>> GetValueRangesForSheet(SpreadSheet spreadSheet, List<MingelBingoCard> mingelBingoCards, int index, string placeholderValue)
+        private async Task UpdateBingoCardsWithRangesFromFirstSheet(SpreadSheet finalFile, List<MingelBingoCard> mingelBingoCards, string placeHolderValue)
         {
-            var sheetName = spreadSheet.SheetNames[index];
+            var cells = await GetA1NotationsForSheet(finalFile.Id, finalFile.SheetNames.First(), placeHolderValue);
 
-            var sheetValues = await _sheetsService.Spreadsheets.Values.Get(spreadSheet.Id, sheetName).ExecuteAsync()
+            var valueRanges = A1NotationCreator.GetA1NotationsForCells(cells);
+
+            foreach (var card in mingelBingoCards)
+                card.A1NotationRanges.AddRange(valueRanges);
+        }
+
+        private async Task<List<List<Cell>>> GetA1NotationsForSheet(string spreadsheetId, string sheetName, string placeholderValue)
+        {
+            var sheetValues = await _sheetsService.Spreadsheets.Values.Get(spreadsheetId, sheetName).ExecuteAsync()
                 ?? throw LogAndReturnException(
-                    new Exception($"Null response when trying to get sheet values using sheet name: {sheetName} for sheet with ID {spreadSheet.SheetIds[index]}."));
+                    new Exception($"Null response when trying to get sheet values using sheet name: {sheetName} for sheet with ID {spreadsheetId}."));
 
             var foundCells = FindPlaceHolderCellsInSheetValues(sheetValues, placeholderValue);
 
@@ -299,9 +303,7 @@ namespace MingelBingoCreator.Repository
                 throw LogAndReturnException(
                     new Exception($"Failed to find placeholder cells (with value {placeholderValue} in sheet: {sheetName}."));
 
-            var valueRanges = ValueRangeCreator.CreateValueRangesForCells(foundCells, mingelBingoCards[index].Values, sheetName);
-
-            return valueRanges;
+            return foundCells;
         }
 
         private static bool CellsFoundInCollection(List<List<Cell>> foundCells)

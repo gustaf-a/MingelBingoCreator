@@ -4,7 +4,6 @@
     {
         public string Id { get; set; }
         public string Name { get; set; }
-        public int TemplateSheetId { get; set; }
         public List<int> SheetIds { get; set; }
         public List<string> SheetNames { get; set; }
     }

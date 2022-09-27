@@ -10,6 +10,12 @@ namespace MingelBingoCreator.Repository.GoogleSheetsHelpers
         private static readonly int ColumnAzNumber = 26;
 
         public static List<A1Notation> GetA1NotationsForCells(List<List<Cell>> foundCells, string sheetName)
+            => GetA1Notations(foundCells, sheetName);
+
+        public static List<A1Notation> GetA1NotationsForCells(List<List<Cell>> foundCells)
+            => GetA1Notations(foundCells, "");
+
+        private static List<A1Notation> GetA1Notations(List<List<Cell>> foundCells, string sheetName = "")
         {
             var foundCellsAreSquare = CheckIfFoundCellsAreInSquareFormation(foundCells);
 
@@ -29,23 +35,21 @@ namespace MingelBingoCreator.Repository.GoogleSheetsHelpers
             {
                 new A1Notation
                 {
-                    A1NotationString = $"{sheetName}!{firstCellA1Notation}:{lastCellA1Notation}",
+                    A1NotationRange = $"{firstCellA1Notation}:{lastCellA1Notation}",
                     NumberOfRows = foundCells.Count,
                     NumberOfColumns = foundCells.First().Count,
+                    SheetName = sheetName
                 }
             };
         }
 
-        public static string GetA1NotationStringForSingleCell(string sheetName, Cell cell)
+        private static string GetA1NotationStringForSingleCellWithoutSheetName(Cell cell)
         {
             if (cell.ColumnIndex >= ColumnAzNumber)
                 throw new NotSupportedException("Templates using more than Z column not supported.");
 
-            return $"{sheetName}!{GetA1NotationStringForSingleCellWithoutSheetName(cell)}";
+            return $"{(char)(UnicodeLetterStart + cell.ColumnIndex)}{cell.RowIndex + 1}";
         }
-
-        private static string GetA1NotationStringForSingleCellWithoutSheetName(Cell cell)
-            => $"{(char)(UnicodeLetterStart + cell.ColumnIndex)}{cell.RowIndex + 1}";
 
         private static bool CheckIfFoundCellsAreInSquareFormation(List<List<Cell>> foundCells)
         {

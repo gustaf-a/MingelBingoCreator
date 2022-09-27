@@ -5,19 +5,17 @@ namespace MingelBingoCreator.Repository.GoogleSheetsHelpers
 {
     internal static class ValueRangeCreator
     {
-        internal static List<ValueRange> CreateValueRangesForCells(List<List<Cell>> foundCells, List<string> values, string sheetName)
+        internal static IEnumerable<ValueRange> CreateValueRangesForCard(List<A1Notation> a1NotationRanges, List<string> values, string sheetName)
         {
-            var a1Notations = A1NotationCreator.GetA1NotationsForCells(foundCells, sheetName);
-
             var valueRanges = new List<ValueRange>();
 
             var valueTakenIndex = 0;
 
-            foreach (var a1Notation in a1Notations)
+            foreach (var a1Notation in a1NotationRanges)
             {
                 valueRanges.Add(new ValueRange
                 {
-                    Range = a1Notation.A1NotationString,
+                    Range = a1Notation.GetA1NotationString(sheetName),
                     Values = GetValuesOfSize(values, a1Notation.NumberOfRows, a1Notation.NumberOfColumns)
                 });
 

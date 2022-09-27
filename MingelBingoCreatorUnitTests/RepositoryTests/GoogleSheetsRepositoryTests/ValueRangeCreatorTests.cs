@@ -12,19 +12,15 @@ namespace MingelBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTest
             //Arrange
             var sheetName = "testName";
 
-            var foundCells = new List<List<Cell>>();
-
-            for (int i = 1; i < 3; i++)
+            var a1NotationRanges = new List<A1Notation>
             {
-                foundCells.Add(new List<Cell>());
-
-                for (int j = 1; j < 4; j++)
-                    foundCells.Last().Add(new Cell
-                    {
-                        RowIndex = i,
-                        ColumnIndex = j
-                    });
-            }
+                new A1Notation
+                {
+                    A1NotationRange = "A1:C2",
+                    NumberOfRows = 2,
+                    NumberOfColumns = 3
+                }
+            };
 
             var values = new List<string>();
 
@@ -32,7 +28,7 @@ namespace MingelBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTest
                 values.Add(i.ToString());
 
             //Act
-            var result = ValueRangeCreator.CreateValueRangesForCells(foundCells, values, sheetName);
+            var result = ValueRangeCreator.CreateValueRangesForCard(a1NotationRanges, values, sheetName);
 
             //Assert
             Assert.Single(result);

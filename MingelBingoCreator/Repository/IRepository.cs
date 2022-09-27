@@ -34,6 +34,6 @@ namespace MingelBingoCreator.Repository
         /// </summary>
         /// <param name="originalSheetId"></param>
         /// <param name="newName"></param>
-        public Task<SpreadSheet> CopyFile(string originalSheetId, string newName);
+        public Task<TemplateSpreadSheet> CopyFile(string originalSheetId, string newName);
     }
 }

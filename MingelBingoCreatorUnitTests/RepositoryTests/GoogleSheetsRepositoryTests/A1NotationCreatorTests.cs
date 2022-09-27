@@ -1,50 +1,31 @@
 ﻿using MingelBingoCreator.Data;
 using MingelBingoCreator.Repository.GoogleSheetsHelpers;
-using System.Data.Common;
 using Xunit;
 
 namespace MingelBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTests
 {
     public static class A1NotationCreatorTests
     {
-        [Theory]
-        [InlineData(0, 0, 'A')]
-        [InlineData(1, 2, 'C')]
-        [InlineData(7, 5, 'F')]
-        [InlineData(60, 25, 'Z')]
-        public static void GetA1NotationString_GetsCorrectCharacter(int row, int column, char character)
+        [Fact]
+        public static void GetA1NotationsForCells_Throws_NotSupported_If_Outside_Range()
         {
             //Arrange
-            var cell = new Cell
-            {
-                RowIndex = row,
-                ColumnIndex = column
-            };
-
-            var sheetName = "test";
-
-            var expected = sheetName + "!" + character + (row + 1).ToString();
-
-            //Act
-            var result = A1NotationCreator.GetA1NotationStringForSingleCell(sheetName, cell);
-
-            //Assert
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public static void GetA1NotationString_Throws_NotSupported_If_Outside_Range()
-        {
             var columnAz = 27;
 
-            var cell = new Cell
+            var foundCells = new List<List<Cell>>
             {
-                RowIndex = 10,
-                ColumnIndex = columnAz
+                new List<Cell>
+                {
+                    new Cell
+                    {
+                        RowIndex = 10,
+                        ColumnIndex = columnAz
+                    }
+                }
             };
 
             //Act and Assert
-            Assert.Throws<NotSupportedException>(() => A1NotationCreator.GetA1NotationStringForSingleCell("test", cell));
+            Assert.Throws<NotSupportedException>(() => A1NotationCreator.GetA1NotationsForCells(foundCells));
         }
 
         [Theory]
@@ -88,7 +69,7 @@ namespace MingelBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTest
 
             var resultNotation = result.First();
 
-            Assert.Equal($"{sheetName}!{expectedNotation}", resultNotation.A1NotationString);
+            Assert.Equal($"{sheetName}!{expectedNotation}", resultNotation.GetA1NotationString());
         }
 
         [Theory]
@@ -241,7 +222,5 @@ namespace MingelBingoCreatorUnitTests.RepositoryTests.GoogleSheetsRepositoryTest
             //Act & Assert
             Assert.Throws<NotSupportedException>(() => A1NotationCreator.GetA1NotationsForCells(foundCells, sheetName));
         }
-
-        //TODO Sunshine tests
     }
 }

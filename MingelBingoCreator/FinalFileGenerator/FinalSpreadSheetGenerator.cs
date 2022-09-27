@@ -1,6 +1,8 @@
-﻿using MingelBingoCreator.Configurations;
+﻿using Google.Apis.Sheets.v4.Data;
+using MingelBingoCreator.Configurations;
 using MingelBingoCreator.Data;
 using MingelBingoCreator.Repository;
+using MingelBingoCreator.Repository.GoogleSheetsHelpers;
 using Serilog;
 
 namespace MingelBingoCreator.FinalFileGenerator
@@ -36,24 +38,25 @@ namespace MingelBingoCreator.FinalFileGenerator
 
         private async Task<SpreadSheet> CreateFinalFileAsync(List<MingelBingoCard> mingelBingoCards)
         {
-            var newSpreadSheet = await _repository.CopyFile(_appSettings.GoogleSheetsOptions.TemplateSheetId, CreateNewFileName());
+            var finalFileUnprocessed = await _repository.CopyFile(_appSettings.GoogleSheetsOptions.TemplateSheetId, GetNewFileName());
 
-            if (newSpreadSheet == null)
+            if (finalFileUnprocessed == null)
                 throw new Exception("Failed to copy template file with sheets. Null result returned from repository.");
 
-            var templateSpreadSheet = await _repository.CreateMingelBingoCardsFromTemplateSheet(newSpreadSheet, mingelBingoCards.Count);
 
-            var result = await _repository.ReplacePlaceholderWithValues(templateSpreadSheet, _appSettings.GoogleSheetsOptions.PlaceHolderValue, mingelBingoCards);
+            var finalFileWithTabs = await _repository.CreateDuplicateSheetTabsFromTemplateSheetTab(finalFileUnprocessed, mingelBingoCards.Count);
+            
+            var result = await _repository.ReplacePlaceholderWithValues(finalFileWithTabs, _appSettings.GoogleSheetsOptions.PlaceHolderValue, mingelBingoCards);
 
             if (result)
                 Log.Information("Updated placeholder values in final file successfully");
             else
                 Log.Warning("Something went wrong when updating placeholder values. Please check final file manually.");
 
-            return templateSpreadSheet;
+            return finalFileWithTabs;
         }
 
-        private string CreateNewFileName()
+        private string GetNewFileName()
         {
             var dateSuffix = DateTime.Now.ToString("MMdd_HHmm");
 
