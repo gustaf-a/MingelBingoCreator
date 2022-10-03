@@ -74,7 +74,7 @@ namespace MingelBingoCreator.Repository
             return counter;
         }
 
-        public async Task<List<Category>> GetColumns(string sheetId, string sheetName)
+        public async Task<List<DataCategory>> GetColumns(string sheetId, string sheetName)
         {
             var request = _sheetsService.Spreadsheets.Values.Get(sheetId, sheetName);
 
@@ -83,7 +83,7 @@ namespace MingelBingoCreator.Repository
 
             var response = await request.ExecuteAsync();
 
-            var result = new List<Category>();
+            var result = new List<DataCategory>();
 
             foreach (var columnData in response.Values)
             {
@@ -110,7 +110,7 @@ namespace MingelBingoCreator.Repository
                     continue;
                 }
 
-                result.Add(new Category(heading, values));
+                result.Add(new DataCategory(heading, values));
             }
 
             return result;
@@ -257,7 +257,7 @@ namespace MingelBingoCreator.Repository
             return requests;
         }
 
-        public async Task<bool> ReplacePlaceholderWithValues(SpreadSheet spreadSheet, string placeholderValue, List<MingelBingoCard> mingelBingoCards)
+        public async Task<bool> ReplacePlaceholderWithValues(SpreadSheet spreadSheet, string placeholderValue, List<CardValue> mingelBingoCards)
         {
             await UpdateBingoCardsWithRangesFromFirstSheet(spreadSheet, mingelBingoCards, placeholderValue);
 
@@ -281,7 +281,7 @@ namespace MingelBingoCreator.Repository
             return true;
         }
 
-        private async Task UpdateBingoCardsWithRangesFromFirstSheet(SpreadSheet finalFile, List<MingelBingoCard> mingelBingoCards, string placeHolderValue)
+        private async Task UpdateBingoCardsWithRangesFromFirstSheet(SpreadSheet finalFile, List<CardValue> mingelBingoCards, string placeHolderValue)
         {
             var cells = await GetA1NotationsForSheet(finalFile.Id, finalFile.SheetNames.First(), placeHolderValue);
 

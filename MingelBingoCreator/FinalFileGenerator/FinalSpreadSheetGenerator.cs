@@ -18,7 +18,7 @@ namespace MingelBingoCreator.FinalFileGenerator
             _repository = repository;
         }
 
-        internal SpreadSheet CreateFinalFile(List<MingelBingoCard> mingelBingoCards)
+        internal SpreadSheet CreateFinalFile(List<CardValue> mingelBingoCards)
         {
             try
             {
@@ -36,7 +36,7 @@ namespace MingelBingoCreator.FinalFileGenerator
             }
         }
 
-        private async Task<SpreadSheet> CreateFinalFileAsync(List<MingelBingoCard> mingelBingoCards)
+        private async Task<SpreadSheet> CreateFinalFileAsync(List<CardValue> mingelBingoCards)
         {
             var finalFileUnprocessed = await _repository.CopyFile(_appSettings.GoogleSheetsOptions.TemplateSheetId, GetNewFileName());
 

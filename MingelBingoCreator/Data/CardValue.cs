@@ -1,6 +1,6 @@
 ﻿namespace MingelBingoCreator.Data
 {
-    internal class MingelBingoCard
+    internal class CardValue
     {
         public List<string> Values;
 
@@ -9,7 +9,7 @@
         public int CardSize 
             => Values != null ? Values.Count : 0;
 
-        public MingelBingoCard(List<string> values)
+        public CardValue(List<string> values)
         {
             Values = values;
 

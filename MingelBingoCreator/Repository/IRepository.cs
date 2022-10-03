@@ -10,7 +10,7 @@ namespace MingelBingoCreator.Repository
         /// </summary>
         /// <param name="sheetId">Id of the spreadsheet.</param>
         /// <param name="sheetName">Name of the tab.</param>
-        public Task<List<Category>> GetColumns(string sheetId, string sheetName);
+        public Task<List<DataCategory>> GetColumns(string sheetId, string sheetName);
 
         /// <summary>
         /// Counts the occurences of a value in a sheet
@@ -27,7 +27,7 @@ namespace MingelBingoCreator.Repository
         /// <param name="placeholderValue">Placeholder value to look for in cells</param>
         /// <param name="mingelBingoCards">Values to insert into the sheet instead of the placeholders.</param>
         /// <exception cref="PlaceholderCountMismatchException">Thrown when values count doesn't match number of placeholders in sheet.</exception>
-        public Task<bool> ReplacePlaceholderWithValues(SpreadSheet spreadSheet, string placeholderValue, List<MingelBingoCard> mingelBingoCards);
+        public Task<bool> ReplacePlaceholderWithValues(SpreadSheet spreadSheet, string placeholderValue, List<CardValue> mingelBingoCards);
 
         /// <summary>
         /// Creates a copy of a spreadsheet.

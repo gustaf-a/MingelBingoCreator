@@ -1,8 +1,9 @@
-﻿using MingelBingoCreator.Configurations;
+﻿using MingelBingoCreator.CardValueCreator;
+using MingelBingoCreator.CardValueCreator.ValuesHandlerSelector;
+using MingelBingoCreator.Configurations;
 using MingelBingoCreator.DataGathering;
 using MingelBingoCreator.FinalFileGenerator;
 using MingelBingoCreator.Repository;
-using MingelBingoCreator.ValuesGeneration;
 using Newtonsoft.Json;
 using Serilog;
 
@@ -21,22 +22,19 @@ namespace MingelBingoCreator
 
             var dataGatherer = new GoogleSheetsDataGatherer(appSettings, repository);
 
-            var cardsCreator = new MingelBingoValuesGenerator(ValueSelectorFactory.SelectorMethod.Tagged);
+            var cardValueCreator = new CategoryCardValueCreator(appSettings, new TaggedCategoriesValuesHandlerSelector());
 
             var finalFileGenerator = new FinalSpreadSheetGenerator(appSettings, repository);
 
             //----- Execution -----
 
-            //Gathering Data from data files and template files
             var mingelBingoData = dataGatherer.GatherData();
             Log.Information("Gathered data.");
 
-            //Creating list of values from the data based on template files and AppSettings
-            var mingelBingoCards = cardsCreator.GetValues(appSettings, mingelBingoData);
+            var cardValues = cardValueCreator.CreateCardValues(mingelBingoData);
             Log.Information("Values for cards created.");
 
-            //Creating a new file from template file and populating it with previously created values
-            var finalFile = finalFileGenerator.CreateFinalFile(mingelBingoCards);
+            var finalFile = finalFileGenerator.CreateFinalFile(cardValues);
             Log.Information($"Successfully created final file: {finalFile.Name}");
         }
 
