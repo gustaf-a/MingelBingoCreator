@@ -1,6 +1,6 @@
 # MingelBingoCreator  
 
-This is a project used to create highly customizable mingle bingo or Getting-to-know-you-bingo cards (mingelbingo in Swedish) for parties, weddings and more.
+This is a project used to create customizable mingle bingo or Getting-to-know-you-bingo cards (mingelbingo in Swedish) for parties, weddings and more.
 
 ## Solution overview
 
