@@ -119,4 +119,5 @@ The final file that's generated is a copy of the template spreadsheet created in
 - [x] Move range creation to before copying template file to avoid re-reading for each template
 - [x] Readme file
 - [x] Refactor card values creation
+- [ ] Implement Dependency Injection
 - [ ] Add support for discontinuous areas in template to allow completely custom shaped bingo cards
