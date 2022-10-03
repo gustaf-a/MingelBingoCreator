@@ -1,6 +1,6 @@
 ﻿namespace MingelBingoCreator.CardValueCreator.Randomizer
 {
-    internal class Randomizer
+    public class Randomizer
     {
         private readonly Random _random;
 

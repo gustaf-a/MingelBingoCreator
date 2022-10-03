@@ -1,6 +1,6 @@
 ﻿namespace MingelBingoCreator.Data
 {
-    internal class DataCategory
+    public class DataCategory
     {
         public string Heading;
 

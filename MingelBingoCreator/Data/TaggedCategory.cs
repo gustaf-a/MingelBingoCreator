@@ -1,6 +1,6 @@
 ﻿namespace MingelBingoCreator.Data
 {
-    internal class TaggedCategory : DataCategory
+    public class TaggedCategory : DataCategory
     {
         public CategoryTag Category;
 

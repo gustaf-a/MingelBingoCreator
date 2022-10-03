@@ -1,6 +1,6 @@
 ﻿namespace MingelBingoCreator.Data
 {
-    internal class A1Notation
+    public class A1Notation
     {
         public string A1NotationRange { get; set; }
         public int NumberOfRows { get; set; }

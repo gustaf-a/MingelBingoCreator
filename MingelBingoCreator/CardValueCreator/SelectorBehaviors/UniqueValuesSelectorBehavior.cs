@@ -1,6 +1,6 @@
 ﻿namespace MingelBingoCreator.CardValueCreator.SelectorBehaviors
 {
-    internal class UniqueValuesSelectorBehavior : ISelectorBehavior
+    public class UniqueValuesSelectorBehavior : ISelectorBehavior
     {
         private readonly List<int> _selectedIndices;
 

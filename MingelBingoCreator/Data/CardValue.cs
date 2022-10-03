@@ -1,6 +1,6 @@
 ﻿namespace MingelBingoCreator.Data
 {
-    internal class CardValue
+    public class CardValue
     {
         public List<string> Values;
 

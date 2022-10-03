@@ -1,4 +1,5 @@
-﻿using MingelBingoCreator.CardValueCreator;
+﻿using Autofac;
+using MingelBingoCreator.CardValueCreator;
 using MingelBingoCreator.CardValueCreator.ValuesHandlerSelector;
 using MingelBingoCreator.Configurations;
 using MingelBingoCreator.DataGathering;
@@ -9,33 +10,47 @@ using Serilog;
 
 namespace MingelBingoCreator
 {
-    internal class Program
+    public class Program
     {
         static void Main(string[] args)
         {
-            //----- Setup -----
             SetupLogger();
 
-            var appSettings = GetAppSettings();
+            var containerBuilder = new ContainerBuilder();
 
-            var repository = new GoogleSheetsRepository(appSettings);
+            ConfigureServices(containerBuilder);
 
-            var dataGatherer = new GoogleSheetsDataGatherer(appSettings, repository);
+            containerBuilder.RegisterType<ProgramStart>().As<ProgramStart>();
 
-            var cardValueCreator = new CategoryCardValueCreator(appSettings, new TaggedCategoriesValuesHandlerSelector());
+            var container = containerBuilder.Build();
 
-            var finalFileGenerator = new FinalSpreadSheetGenerator(appSettings, repository);
+            try
+            {
+                using var scope = container.BeginLifetimeScope();
 
-            //----- Execution -----
+                var programStart = scope.Resolve<ProgramStart>();
 
-            var mingelBingoData = dataGatherer.GatherData();
-            Log.Information("Gathered data.");
+                programStart.Execute();
+            }
+            catch (Exception)
+            {
 
-            var cardValues = cardValueCreator.CreateCardValues(mingelBingoData);
-            Log.Information("Values for cards created.");
+                throw;
+            }
 
-            var finalFile = finalFileGenerator.CreateFinalFile(cardValues);
-            Log.Information($"Successfully created final file: {finalFile.Name}");
+        }
+
+        private static void ConfigureServices(ContainerBuilder builder)
+        {
+            builder.RegisterType<JsonConfigurationsReader>().As<IConfigurationsReader>().SingleInstance();
+            builder.RegisterType<GoogleSheetsRepository>().As<IRepository>().SingleInstance();
+
+            builder.RegisterType<GoogleSheetsDataGatherer>().As<IDataGatherer>();
+            builder.RegisterType<CategoryCardValueCreator>().As<ICardValueCreator>();
+            builder.RegisterType<FinalSpreadSheetGenerator>().As<IFinalFileCreator>();
+
+            builder.RegisterType<TaggedCategoriesValuesHandlerSelector>().As<IValuesHandlerSelector>();
+            builder.RegisterType<TaggedCategoryIdentifier>().As<ITaggedCategoryIdentifier>();
         }
 
         private static void SetupLogger()
@@ -45,27 +60,6 @@ namespace MingelBingoCreator
                 .WriteTo.Console()
                 .WriteTo.File("logs/mingelBingoCreator.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
-        }
-
-        private static AppSettings GetAppSettings()
-        {
-            try
-            {
-                var rawFile = File.ReadAllText("appsettings.json");
-                if (string.IsNullOrEmpty(rawFile))
-                    throw new Exception("Failed to find or load appsettings.json file");
-
-                var appSettings = JsonConvert.DeserializeObject<AppSettings>(rawFile);
-                if (appSettings == null)
-                    throw new Exception("Failed to deserialize file to AppSettings-object.");
-
-                return appSettings;
-            }
-            catch (Exception e)
-            {
-                Log.Error(e, "Failed to read appsettings. Please ensure appsettings.json is correct: {0}", e.Message);
-                throw;
-            }
         }
     }
 }

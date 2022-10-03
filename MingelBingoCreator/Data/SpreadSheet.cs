@@ -1,6 +1,6 @@
 ﻿namespace MingelBingoCreator.Data
 {
-    internal class SpreadSheet
+    public class SpreadSheet
     {
         public string Id { get; set; }
         public string Name { get; set; }

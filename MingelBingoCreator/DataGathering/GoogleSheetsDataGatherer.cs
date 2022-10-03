@@ -5,24 +5,25 @@ using Serilog;
 
 namespace MingelBingoCreator.DataGathering
 {
-    internal class GoogleSheetsDataGatherer
+    public class GoogleSheetsDataGatherer : IDataGatherer
     {
         private AppSettings _appSettings;
-        private GoogleSheetsRepository _repository;
+        private IRepository _repository;
 
-        public GoogleSheetsDataGatherer(AppSettings appSettings, GoogleSheetsRepository repository)
+        public GoogleSheetsDataGatherer(IConfigurationsReader configReader, IRepository repository)
         {
-            _appSettings = appSettings;
+            _appSettings = configReader.GetAppSettings();
             _repository = repository;
         }
 
-        internal MingelBingoData GatherData()
+        public MingelBingoData GatherData()
         {
             var sheetsOptions = _appSettings.GoogleSheetsOptions;
             
             try
             {
                 var taskGetData = _repository.GetColumns(sheetsOptions.DataSheetId, sheetsOptions.DataSheetTabName);
+                
                 var taskCountPlaceHolderCells = _repository.CountCellsWithValue(sheetsOptions.TemplateSheetId, sheetsOptions.TemplateSheetTabName, sheetsOptions.PlaceHolderValue);
                 
                 Task.WaitAll(taskGetData, taskCountPlaceHolderCells);

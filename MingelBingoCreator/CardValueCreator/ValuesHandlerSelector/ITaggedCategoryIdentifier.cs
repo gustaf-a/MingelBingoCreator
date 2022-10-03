@@ -2,7 +2,7 @@
 
 namespace MingelBingoCreator.CardValueCreator.ValuesHandlerSelector
 {
-    internal interface ITaggedCategoryIdentifier
+    public interface ITaggedCategoryIdentifier
     {
         public bool IsAnyTaggedCategory(string categoryHeading);
 

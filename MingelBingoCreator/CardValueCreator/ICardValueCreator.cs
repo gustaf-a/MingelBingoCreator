@@ -2,7 +2,7 @@
 
 namespace MingelBingoCreator.CardValueCreator
 {
-    internal interface ICardValueCreator
+    public interface ICardValueCreator
     {
         public List<CardValue> CreateCardValues(MingelBingoData data);
     }

@@ -1,24 +1,23 @@
-﻿using Google.Apis.Sheets.v4.Data;
-using MingelBingoCreator.Configurations;
+﻿using MingelBingoCreator.Configurations;
 using MingelBingoCreator.Data;
 using MingelBingoCreator.Repository;
-using MingelBingoCreator.Repository.GoogleSheetsHelpers;
 using Serilog;
 
 namespace MingelBingoCreator.FinalFileGenerator
 {
-    internal class FinalSpreadSheetGenerator
+    public class FinalSpreadSheetGenerator : IFinalFileCreator
     {
         private readonly AppSettings _appSettings;
-        private readonly GoogleSheetsRepository _repository;
 
-        public FinalSpreadSheetGenerator(AppSettings appSettings, GoogleSheetsRepository repository)
+        private readonly IRepository _repository;
+
+        public FinalSpreadSheetGenerator(IConfigurationsReader configReader, IRepository repository)
         {
-            _appSettings = appSettings;
+            _appSettings = configReader.GetAppSettings();
             _repository = repository;
         }
 
-        internal SpreadSheet CreateFinalFile(List<CardValue> mingelBingoCards)
+        public SpreadSheet CreateFinalFile(List<CardValue> mingelBingoCards)
         {
             try
             {

@@ -4,13 +4,13 @@ using Serilog;
 
 namespace MingelBingoCreator.CardValueCreator.ValuesHandlerSelector
 {
-    internal class TaggedCategoriesValuesHandlerSelector : IValuesHandlerSelector
+    public class TaggedCategoriesValuesHandlerSelector : IValuesHandlerSelector
     {
         private readonly ITaggedCategoryIdentifier _taggedCategoryIdentifier;
 
-        public TaggedCategoriesValuesHandlerSelector()
+        public TaggedCategoriesValuesHandlerSelector(ITaggedCategoryIdentifier taggedCategoryIdentifier)
         {
-            _taggedCategoryIdentifier = new TaggedCategoryIdentifier();
+            _taggedCategoryIdentifier = taggedCategoryIdentifier;
         }
 
         public List<IValuesHandler> GetValuesHandlers(MingelBingoData data)

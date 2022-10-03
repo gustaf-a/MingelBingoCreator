@@ -2,7 +2,7 @@
 
 namespace MingelBingoCreator.CardValueCreator.ValuesHandler
 {
-    internal class ValuesHandlerBuilder : IValuesHandlerBuilder
+    public class ValuesHandlerBuilder : IValuesHandlerBuilder
     {
         private ValuesHandler _valuesHandler;
 

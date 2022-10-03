@@ -1,7 +1,7 @@
 ﻿
 namespace MingelBingoCreator.Data
 {
-    internal class MingelBingoData
+    public class MingelBingoData
     {
         public List<DataCategory> RawDataCategories { get; private set; }
         public int CellsInEachBoard { get; private set; }

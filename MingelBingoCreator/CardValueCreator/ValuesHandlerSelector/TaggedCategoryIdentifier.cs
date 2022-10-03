@@ -3,7 +3,7 @@ using Serilog;
 
 namespace MingelBingoCreator.CardValueCreator.ValuesHandlerSelector
 {
-    internal class TaggedCategoryIdentifier : ITaggedCategoryIdentifier
+    public class TaggedCategoryIdentifier : ITaggedCategoryIdentifier
     {
         private const string ArgumentSplitCharacter = "_";
         private const string BeforeTagsSymbol = "#";

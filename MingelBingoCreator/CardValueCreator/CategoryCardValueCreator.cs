@@ -4,7 +4,7 @@ using MingelBingoCreator.Data;
 
 namespace MingelBingoCreator.CardValueCreator
 {
-    internal class CategoryCardValueCreator : ICardValueCreator
+    public class CategoryCardValueCreator : ICardValueCreator
     {
         private readonly AppSettings _appSettings;
 
@@ -12,9 +12,9 @@ namespace MingelBingoCreator.CardValueCreator
 
         private static readonly Random _random = new();
 
-        public CategoryCardValueCreator(AppSettings appSettings, IValuesHandlerSelector valuesHandlerSelector)
+        public CategoryCardValueCreator(IConfigurationsReader configReader, IValuesHandlerSelector valuesHandlerSelector)
         {
-            _appSettings = appSettings;
+            _appSettings = configReader.GetAppSettings();
 
             _valuesHandlerSelector = valuesHandlerSelector;
         }

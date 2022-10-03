@@ -1,6 +1,6 @@
 ﻿namespace MingelBingoCreator.CardValueCreator.SelectorBehaviors
 {
-    internal class RepeatingValuesSelectorBehavior : ISelectorBehavior
+    public class RepeatingValuesSelectorBehavior : ISelectorBehavior
     {
         private List<int> _selectedIndices;
 

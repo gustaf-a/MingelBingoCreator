@@ -3,7 +3,7 @@ using MingelBingoCreator.Data;
 
 namespace MingelBingoCreator.Repository
 {
-    internal interface IRepository
+    public interface IRepository
     {
         /// <summary>
         /// Collects the columns of data from a sheet in the workbook.
@@ -35,5 +35,7 @@ namespace MingelBingoCreator.Repository
         /// <param name="originalSheetId"></param>
         /// <param name="newName"></param>
         public Task<TemplateSpreadSheet> CopyFile(string originalSheetId, string newName);
+
+        public Task<SpreadSheet> CreateDuplicateSheetTabsFromTemplateSheetTab(TemplateSpreadSheet finalFileUnprocessed, int count);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MingelBingoCreator.CardValueCreator.ValuesHandlerSelector;
 using MingelBingoCreator.Data;
+using Moq;
 using Xunit;
 
 namespace MingelBingoCreatorUnitTests.CardValueCreatorTests.ValuesHandlerSelectorTests
@@ -10,8 +11,6 @@ namespace MingelBingoCreatorUnitTests.CardValueCreatorTests.ValuesHandlerSelecto
         public static void TaggedCategoriesValuesHandlerSelector_returns_correct_valuesHandlers()
         {
             //Arrange
-            var taggedCategoriesValuesHandlerSelector = new TaggedCategoriesValuesHandlerSelector();
-
             var dataCategories = new List<DataCategory>
             {
                 new DataCategory(
@@ -21,7 +20,7 @@ namespace MingelBingoCreatorUnitTests.CardValueCreatorTests.ValuesHandlerSelecto
                 new DataCategory(
                     "Ignore values #Ignore",
                     new(){"ignore"}
-                ),                
+                ),
                 new DataCategory(
                     "Unique values #UniquePerBoard_1",
                     new(){"unique"}
@@ -30,7 +29,11 @@ namespace MingelBingoCreatorUnitTests.CardValueCreatorTests.ValuesHandlerSelecto
                     "Each board values #OnEachBoard_1",
                     new(){"on each board"}
                 )
-            };
+            };   
+
+            var taggedCategoryIdentifier = new TaggedCategoryIdentifier();
+
+            var taggedCategoriesValuesHandlerSelector = new TaggedCategoriesValuesHandlerSelector(taggedCategoryIdentifier);
 
             var data = new MingelBingoData(dataCategories, 16);
 

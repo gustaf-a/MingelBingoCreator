@@ -10,15 +10,15 @@ using Serilog;
 
 namespace MingelBingoCreator.Repository
 {
-    internal class GoogleSheetsRepository : IRepository
+    public class GoogleSheetsRepository : IRepository
     {
         private static readonly string[] _scopes = { SheetsService.Scope.Spreadsheets };
 
         private SheetsService _sheetsService;
 
-        public GoogleSheetsRepository(AppSettings appSettings)
+        public GoogleSheetsRepository(IConfigurationsReader configReader)
         {
-            _sheetsService = CreateService(appSettings);
+            _sheetsService = CreateService(configReader.GetAppSettings());
         }
 
         private static SheetsService CreateService(AppSettings appSettings)
@@ -195,7 +195,7 @@ namespace MingelBingoCreator.Repository
                 ?? throw LogAndReturnException(new Exception($"Failed to find sheetId for destination spreadsheet's new sheet. Spreadsheet Id: {destinationSpreadSheetId}"));
         }
 
-        internal async Task<SpreadSheet> CreateDuplicateSheetTabsFromTemplateSheetTab(TemplateSpreadSheet spreadSheet, int numberOfCardsToCreate)
+        public async Task<SpreadSheet> CreateDuplicateSheetTabsFromTemplateSheetTab(TemplateSpreadSheet spreadSheet, int numberOfCardsToCreate)
         {
             var requests = new List<Request>();
 

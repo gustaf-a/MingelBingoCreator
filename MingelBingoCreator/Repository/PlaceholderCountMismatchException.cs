@@ -1,7 +1,7 @@
 ﻿
 namespace MingelBingoCreator.Repository
 {
-    internal class PlaceholderCountMismatchException : Exception
+    public class PlaceholderCountMismatchException : Exception
     {
     }
 }
